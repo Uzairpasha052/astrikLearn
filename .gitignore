@@ -1,0 +1,39 @@
+# ==========================================
+# ASP.NET Core / .NET
+# ==========================================
+
+# Build output
+backend/bin/
+backend/obj/
+
+# Visual Studio
+backend/.vs/
+backend/*.user
+backend/*.suo
+
+# Test results
+backend/TestResults/
+
+# NuGet packages (generated/local packages)
+backend/packages/
+
+# ==========================================
+# IDE and editor files
+# ==========================================
+
+.vscode/
+.idea/
+
+# ==========================================
+# Operating system files
+# ==========================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# Logs
+# ==========================================
+
+*.log

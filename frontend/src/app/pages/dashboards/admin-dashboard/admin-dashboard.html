@@ -1,0 +1,144 @@
+<div class="dashboard">
+
+  <div class="dashboard-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p>Welcome back, Admin 👋</p>
+    </div>
+
+    <!-- <button class="action-btn">
+      + Add User
+    </button> -->
+  </div>
+
+  <!-- Statistics -->
+
+  <div class="stats-grid">
+
+    @for (stat of stats; track stat.title) {
+      <div class="stat-card">
+
+        <div class="stat-icon" [class]="stat.type">
+          ●
+        </div>
+
+        <div class="stat-info">
+          <span>{{ stat.title }}</span>
+          <h2>{{ stat.value }}</h2>
+          <small>{{ stat.change }} from last month</small>
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+  <!-- Main Content -->
+
+  <div class="content-grid">
+
+    <div class="card">
+
+      <div class="card-header">
+        <div>
+          <h2>Recent Users</h2>
+          <p>Recently registered users</p>
+        </div>
+
+        <button class="view-btn">View All</button>
+      </div>
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (user of recentUsers; track user.email) {
+              <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                  <span
+                    class="status"
+                    [class.active]="user.status === 'Active'"
+                    [class.inactive]="user.status === 'Inactive'"
+                  >
+                    {{ user.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <div class="card activity-card">
+
+      <div class="card-header">
+        <div>
+          <h2>System Activity</h2>
+          <p>Latest activities</p>
+        </div>
+      </div>
+
+      <div class="activity">
+
+        <div class="activity-item">
+          <span class="dot green"></span>
+          <div>
+            <strong>New user registered</strong>
+            <p>John Doe joined the system</p>
+            <small>5 minutes ago</small>
+          </div>
+        </div>
+
+        <div class="activity-item">
+          <span class="dot blue"></span>
+          <div>
+            <strong>New order created</strong>
+            <p>Order #ORD-1024 was created</p>
+            <small>20 minutes ago</small>
+          </div>
+        </div>
+
+        <div class="activity-item">
+          <span class="dot orange"></span>
+          <div>
+            <strong>Payment received</strong>
+            <p>$2,450 payment received</p>
+            <small>1 hour ago</small>
+          </div>
+        </div>
+
+        <div class="activity-item">
+          <span class="dot red"></span>
+          <div>
+            <strong>User account disabled</strong>
+            <p>Mike Johnson was disabled</p>
+            <small>2 hours ago</small>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

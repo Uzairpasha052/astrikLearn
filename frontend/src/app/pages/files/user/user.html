@@ -1,0 +1,69 @@
+
+<div class="dashboard">
+
+  <div class="dashboard-header">
+    <div>
+      <h1>User Portal</h1>
+      <p>Welcome back 👋</p>
+    </div>
+
+    <!-- <button class="action-btn"> -->
+        <a routerLink="/admin/register" class="action-btn">+ Add User</a>
+    <!-- </button> -->
+  </div>
+
+ 
+
+  <!-- Main Content -->
+
+  <div class="content-grid">
+
+    <div class="card">
+
+      <div class="card-header">
+        <div>
+          <h2>Recent Users</h2>
+          <p>Recently registered users</p>
+        </div>
+
+        <!-- <button class="view-btn">View All</button> -->
+      </div>
+
+      <div class="table-container">
+
+        @if (loading()) {
+        <p>Loading...</p>
+        } @else if (error()) {
+        <p class="error">{{ error() }}</p>
+        } @else {
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created</th>
+            </tr>
+            </thead>
+            <tbody>
+            @for (u of users(); track u.id) {
+                <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.name }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.role }}</td>
+                <td>{{ u.date | date: 'dd MMM yyyy'}}</td>
+                </tr>
+            } @empty {
+                <tr><td colspan="4">No users found</td></tr>
+            }
+            </tbody>
+        </table>
+        }
+        
+      </div>
+    </div>
+  </div>
+
+</div>

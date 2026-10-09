@@ -1,0 +1,21 @@
+.unauthorized {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.unauthorized h1 {
+  font-size: 80px;
+  margin: 0;
+}
+
+.unauthorized h2 {
+  margin: 10px 0;
+}
+
+.unauthorized p {
+  margin-bottom: 20px;
+}

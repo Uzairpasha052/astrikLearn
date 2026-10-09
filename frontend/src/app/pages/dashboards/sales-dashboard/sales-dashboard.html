@@ -1,0 +1,145 @@
+<div class="dashboard">
+
+  <div class="dashboard-header">
+
+    <div>
+      <h1>Sales Dashboard</h1>
+      <p>Here's what's happening with your sales today.</p>
+    </div>
+
+    <button class="action-btn">
+      + New Deal
+    </button>
+
+  </div>
+
+  <!-- Stats -->
+
+  <div class="stats-grid">
+
+    @for (stat of stats; track stat.title) {
+
+      <div class="stat-card">
+
+        <div class="icon">
+          ↑
+        </div>
+
+        <div>
+          <span>{{ stat.title }}</span>
+          <h2>{{ stat.value }}</h2>
+          <small>{{ stat.change }} from last month</small>
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+  <!-- Main -->
+
+  <div class="content-grid">
+
+    <div class="card">
+
+      <div class="card-header">
+
+        <div>
+          <h2>Recent Deals</h2>
+          <p>Your latest sales opportunities</p>
+        </div>
+
+        <button class="view-btn">
+          View All
+        </button>
+
+      </div>
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Deal</th>
+              <th>Value</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (deal of deals; track deal.customer) {
+
+              <tr>
+
+                <td>{{ deal.customer }}</td>
+
+                <td>{{ deal.deal }}</td>
+
+                <td>{{ deal.value }}</td>
+
+                <td>
+
+                  <span
+                    class="status"
+                    [class.won]="deal.status === 'Won'"
+                    [class.negotiation]="deal.status === 'Negotiation'"
+                    [class.pending]="deal.status === 'Pending'"
+                  >
+                    {{ deal.status }}
+                  </span>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <!-- Sales Target -->
+
+    <div class="card">
+
+      <h2>Monthly Target</h2>
+
+      <p class="subtitle">
+        Sales performance
+      </p>
+
+      <div class="target">
+
+        <div class="circle">
+          <strong>78%</strong>
+        </div>
+
+        <h3>$84,520</h3>
+
+        <p>of $108,000 target</p>
+
+      </div>
+
+      <div class="progress">
+
+        <div class="progress-bar"></div>
+
+      </div>
+
+      <p class="remaining">
+        $23,480 remaining
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
