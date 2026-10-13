@@ -117,15 +117,13 @@
             [(ngModel)]="role"
             required
             >
-            <option value="" disabled>Select your role</option>
-            <option value="Admin">Admin</option>
-            <option value="Accountant">Accountant</option>
-            <option value="Sales">Sales User</option>
+            <option [ngValue]="0" disabled>Select your role</option>
+            <option [ngValue]="2">Admin</option>
+            <option [ngValue]="1">Accountant</option>
+            <option [ngValue]="3">Sales User</option>
             </select>
         </div>
 
-
-        
       </div>
 
       <!-- <label class="terms-label">

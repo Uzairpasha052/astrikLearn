@@ -41,9 +41,30 @@ public class AppDbContext : DbContext
 
     public DbSet<Reminder> Reminders { get; set; }
 
+    public DbSet<Role> Roles { get; set; }
+
+    //protected override void OnModelCreating(ModelBuilder modelBuilder)
+    //{
+    //    base.OnModelCreating(modelBuilder);
+
+    //    modelBuilder.Entity<User>()
+    //        .HasOne(u => u.Role)
+    //        .WithMany(r => r.Users)
+    //        .HasForeignKey(u => u.RoleId);
+    //}
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // =====================================================
+        // Role
+        // =====================================================
+
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RoleId);
 
         // =====================================================
         // Customer

@@ -1,4 +1,5 @@
 using backend.DTOs;
+using backend.DTOs.Pagination;
 using backend.Model;
 using backend.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -32,17 +33,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        return Ok(new
-        {
-           message = "Registration Successfull",
-           user = new
-           {
-               result.Id,
-               result.Name,
-               result.Mail,
-               result.Role
-           } 
-        });
+        return Ok(result);
     }
 
     [HttpPost("login")]
@@ -58,28 +49,15 @@ public class AuthController : ControllerBase
             });
         }
 
-        var token = _service.GenerateToken(result);
-
-        return Ok(new
-        {
-            message = "Login Successfull",
-            token = token,
-            user = new
-            {
-                result.Id,
-                result.Name,
-                result.Mail,
-                result.Role
-            }
-        });
+        return Ok(result);
     }
 
 
     [Authorize(Roles = "Admin")]
     [HttpGet("users")]
-    public async Task<IActionResult> UserDisplay()
+    public async Task<IActionResult> UserDisplay([FromQuery] PaginationRequest request)
     {
-        var user = await _service.UserDisplayAsync();
+        var user = await _service.UserDisplayAsync(request);
 
         return Ok(user);
     }

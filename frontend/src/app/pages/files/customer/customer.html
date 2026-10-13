@@ -6,11 +6,9 @@
       <h1>Customer Portal</h1>
       <p>Welcome back 👋</p>
     </div>
-
-    <!-- <button class="action-btn"> -->
-        <!-- <a routerLink="/admin/register" class="btn">+ Add User</a> -->
-         <button class="action-btn " (click)="openForm()">+ Add Customer</button>
-    <!-- </button> -->
+      @if(canCreate){
+        <button class="action-btn " (click)="openForm()">+ Add Customer</button>
+      }
   </div>
 
  
@@ -30,7 +28,7 @@
 
         @if (showForm()) {
             <form class="card form" [formGroup]="form" (ngSubmit)="submit()">
-            <h3>New Customer</h3>
+            <h3>{{ editingId() ? 'Edit Customer' : 'New Customer' }}</h3>
 
             <label>
                 Name *
@@ -61,7 +59,7 @@
             <div class="actions">
                 <button type="button" class="btn" (click)="closeForm()">Cancel</button>
                 <button type="submit" class="btn primary" [disabled]="saving()">
-                {{ saving() ? 'Saving...' : 'Save' }}
+                {{ saving() ? 'Saving...' : (editingId() ? 'Update' : 'Save') }}
                 </button>
             </div>
             </form>
@@ -90,6 +88,9 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Address</th>
+                @if(canEditDelete) {
+                  <th>Action</th>
+                }
             </tr>
             </thead>
             <tbody>
@@ -100,10 +101,24 @@
                     <td>{{ c.email }}</td>
                     <td>{{ c.phone }}</td>
                     <td>{{ c.address }}</td>
+                    @if(canEditDelete){
+                      <td>
+                        <div class="row-actions">
+                          <button type="button" class="btn-sm btn-edit" (click)="edit(c)">Edit</button>
+                          <button type="button" class="btn-sm btn-delete"
+                                  [disabled]="deletingId() === c.id"
+                                  (click)="remove(c)">
+                            {{ deletingId() === c.id ? 'Deleting...' : 'Delete' }}
+                          </button>
+                        </div>
+
+                      </td>
+                     
+                    }
                 </tr>
             } @empty {
                 <tr>
-                    <td colspan="5" class="empty">No customers yet</td>
+                    <td [attr.colspan]="canEditDelete ? 6 : 5" class="empty">No customers yet</td>
                 </tr>
             }
             </tbody>

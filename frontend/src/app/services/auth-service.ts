@@ -5,12 +5,13 @@ import { Observable } from 'rxjs';
 
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { PagedResult } from '../model/pagination.model';
 
 export interface RegisterRequest {
     name: string,
     email : string,
     password: string,
-    role : string
+    role : number
 }
 
 export interface LoginRequest {
@@ -18,10 +19,10 @@ export interface LoginRequest {
     password: string,
 }
 
-export interface AuthResponse {
-  message: string;
+export interface AuthResponse extends User{
+//   message: string;
   token: string,
-  user: User;
+//   user: User;
 }
 
 export interface User {
@@ -64,9 +65,15 @@ export class AuthService {
         )
     }
 
-    getLoginUser(): Observable<UserDisplay[]>{
-        return this.http.get<UserDisplay[]>(
-            `${this.url}/users`
+    getLoginUser(
+        pageNumber: number = 1,
+        pageSize: number = 10
+    ): Observable<PagedResult<UserDisplay>>{
+        return this.http.get<PagedResult<UserDisplay>>(
+            `${this.url}/users`,
+            {
+                params: {pageNumber, pageSize}
+            }
         )
     }
 
@@ -97,6 +104,11 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  hasRole(...roles: string[]): boolean{
+    const role = this.getRole();
+    return !!role && roles.includes(role)
   }
 
 //   logout(): void {

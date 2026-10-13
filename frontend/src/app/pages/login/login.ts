@@ -31,17 +31,19 @@ export class Login {
     }).subscribe({
       next: (response) => {
         console.log('Login successful:', response);
+        const { token, ...user} = response
 
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user))
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user))
 
-        if(response.user.role === 'Admin'){
+        
+        if(response.role === 'Admin'){
           this.router.navigate(['/admin/dashboard'])
         }
-        else if(response.user.role === 'Accountant'){
+        else if(response.role === 'Accountant'){
           this.router.navigate(['/accountant/dashboard'])
         }
-        else if(response.user.role === 'Sales'){
+        else if(response.role === 'Sales'){
           this.router.navigate(['/sales/dashboard'])
         }
         

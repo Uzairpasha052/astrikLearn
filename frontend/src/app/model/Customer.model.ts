@@ -5,6 +5,8 @@ export interface CustomerDto {
   email?: string;
   phone?: string;
   address?: string;
+  isActive: boolean;
+  date: string;
 }
 
 export interface CreateCustomerDto {

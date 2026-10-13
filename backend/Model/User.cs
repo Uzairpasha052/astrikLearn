@@ -1,4 +1,6 @@
 
+using backend.Model.Database;
+
 namespace backend.Model;
 
 public class User
@@ -11,13 +13,13 @@ public class User
 
     public string Password { get; set; } = string.Empty;
 
-    public string Role { get; set; } = string.Empty;
+    //public string Role { get; set; } = string.Empty;
+    public int RoleId { get; set; }
+
+    public Role Role { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; }
-
-    // public string IsActive { get; set;} = "Active";
-    // public string IsDeleted { get; set; } = "false";
 
 }

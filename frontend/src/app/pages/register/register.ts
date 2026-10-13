@@ -19,7 +19,7 @@ export class Register {
   email = '';
   password = '';
   confirmPassword = '';
-  role = '';
+  role: number = 0;
   // agreeTerms = false;
 
   showPassword = false;
@@ -61,8 +61,4 @@ export class Register {
       });
 
   }
-
-  // socialRegister(): void {
-  //   console.log('Register with Google');
-  // }
 }

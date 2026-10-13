@@ -1,4 +1,7 @@
 using backend.Service;
+using backend.Interface;
+using backend.Repository;
+
 using Microsoft.EntityFrameworkCore;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -62,6 +65,10 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomerService>();

@@ -1,22 +1,29 @@
-﻿using backend.Model.Database;
-using backend.DTOs.CustomerDTOs;
-using Microsoft.EntityFrameworkCore;
+﻿using backend.DTOs.CustomerDTOs;
+using backend.DTOs.Pagination;
+using backend.Helper;
+using backend.Interface;
+using backend.Model.Database;
+//using backend.Repository;
 
 namespace backend.Service;
 
 public class CustomerService
 {
-    private readonly AppDbContext _context;
+    private readonly ICustomerRepository _repository;
 
-    public CustomerService(AppDbContext context)
+    public CustomerService(ICustomerRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
-    public async Task<List<CustomerDto>> GetCustomersAsync()
+    public async Task<PagedResult<CustomerDto>> GetCustomersAsync(
+        PaginationRequest request)
     {
-        return await _context.Customers
-            .Where(u => !u.IsDeleted && u.IsActive)
+        var customers = await _repository.GetPagedAsync(request);
+        return new PagedResult<CustomerDto>
+        {
+            Items = customers.Items
+            .Where(c => !c.IsDeleted)
             .Select(c => new CustomerDto
             {
                 Id = c.Id,
@@ -24,33 +31,50 @@ public class CustomerService
                 Email = c.Email,
                 Phone = c.Phone,
                 Address = c.Address,
+                IsActive = c.IsActive,
                 Created = c.CreatedAt
-            }).ToListAsync();
+            })
+            .ToList(),
+
+            TotalCount = customers.Items.Count(c => !c.IsDeleted),
+            PageNumber = customers.PageNumber,
+            PageSize = customers.PageSize
+        };
     }
 
     public async Task<CustomerDto?> GetCustomersByIdAsync(int id)
     {
-        return await _context.Customers
-            .Where(u => u.Id == id && !u.IsDeleted && u.IsActive)
-            .Select(c => new CustomerDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Email = c.Email,
-                Phone = c.Phone,
-                Address = c.Address,
-                Created = c.CreatedAt
-            }).FirstOrDefaultAsync();
+        var customer = await _repository.GetByIdAsync(id);
+
+        if (customer == null || customer.IsDeleted || !customer.IsActive) 
+        {
+            return null;
+        }
+
+        return MapToDto(customer);
+
+        //return await _context.Customers
+        //    .Where(u => u.Id == id && !u.IsDeleted && u.IsActive)
+        //    .Select(c => new CustomerDto
+        //    {
+        //        Id = c.Id,
+        //        Name = c.Name,
+        //        Email = c.Email,
+        //        Phone = c.Phone,
+        //        Address = c.Address,
+        //        Created = c.CreatedAt
+        //    }).FirstOrDefaultAsync();
     }
 
     public async Task<CustomerDto> CreateCustomerAsync(CreateCustomerDto dto, int UserId)
     {
+
         if (!string.IsNullOrWhiteSpace(dto.Email))
         {
-            var ExistingCustomer = await _context.Customers.FirstOrDefaultAsync(
-                u => u.Email == dto.Email && !u.IsDeleted);
+            var existingCustomer = await _repository.GetByEmailAsync(dto.Email);
+                //_context.Customers.FirstOrDefaultAsync(u => u.Email == dto.Email && !u.IsDeleted);
 
-            if (ExistingCustomer != null)
+            if (existingCustomer != null && !existingCustomer.IsDeleted)
             {
                 return null;
             }
@@ -70,10 +94,88 @@ public class CustomerService
             IsDeleted = false
         };
 
-        _context.Customers.Add(customer);
+        var createdCustomer = await _repository.CreateAsync(customer);
 
-        await _context.SaveChangesAsync();
+        return MapToDto(createdCustomer);
 
+        //_context.Customers.Add(customer);
+
+        //await _context.SaveChangesAsync();
+
+        //return new CustomerDto
+        //{
+        //    Id = customer.Id,
+        //    Name = customer.Name,
+        //    Email = customer.Email,
+        //    Phone = customer.Phone,
+        //    Address = customer.Address,
+        //    IsActive = customer.IsActive,
+        //    Created = customer.CreatedAt
+        //};
+       
+    }
+
+    public async Task<CustomerDto?> UpdateCustomerAsync(
+        int id, UpdateCustomerDto dto, int UserId )
+    {
+        var customer = await _repository.GetByIdAsync(id); 
+    
+        if(customer == null || customer.IsDeleted)
+        {
+            return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Email))
+        {
+            var existingCustomer =
+                await _repository.GetByEmailAsync(dto.Email);
+
+            if (existingCustomer != null
+                && !existingCustomer.IsDeleted
+                && existingCustomer.Id != id)
+            {
+                return null;
+            }
+        }
+
+        customer.Name = dto.Name;
+        customer.Email = dto.Email;
+        customer.Phone = dto.Phone;
+        customer.Address = dto.Address;
+
+        customer.UpdatedAt = DateTime.UtcNow;
+        customer.UpdatedBy = UserId;
+
+        var updated =
+        await _repository.UpdateAsync(customer);
+
+        if (!updated)
+        {
+            return null;
+        }
+
+        return MapToDto(customer);
+
+    }
+
+    public async Task<bool> DeleteCustomerAsync(int id, int userId)
+    {
+        var customer = await _repository.GetByIdAsync(id);
+
+        if (customer == null || customer.IsDeleted)
+        {
+            return false;
+        }
+
+        customer.IsActive = false;
+        customer.UpdatedAt = DateTime.UtcNow;
+        customer.UpdatedBy = userId;
+
+        return await _repository.UpdateAsync(customer);
+    }
+
+    private static CustomerDto MapToDto(Customer customer)
+    {
         return new CustomerDto
         {
             Id = customer.Id,
@@ -84,60 +186,6 @@ public class CustomerService
             IsActive = customer.IsActive,
             Created = customer.CreatedAt
         };
-       
-    }
-
-    public async Task<CustomerDto> UpdateCustomerAsync(
-        int id, UpdateCustomerDto dto, int UserId )
-    {
-        var customer = await _context.Customers.FirstOrDefaultAsync(
-            u => u.Id == id && !u.IsDeleted); 
-    
-        if(customer == null)
-        {
-            return null;
-        }
-
-        customer.Name = dto.Name;
-        customer.Email = dto.Email;
-        customer.Phone = dto.Phone;
-        customer.Address = dto.Address;
-        customer.IsActive = dto.IsActive;
-
-        customer.UpdatedAt = DateTime.UtcNow;
-        customer.UpdatedBy = UserId;
-
-        await _context.SaveChangesAsync();
-
-        return new CustomerDto
-        {
-            Id = customer.Id,
-            Name = customer.Name,
-            Email = customer.Email,
-            Phone = customer.Phone,
-            Address = customer.Address,
-            IsActive = customer.IsActive
-        };
-
-    }
-
-    public async Task<bool> DeleteCustomerAsync(int id, int userId)
-    {
-        var customer = await _context.Customers
-            .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
-
-        if (customer == null)
-        {
-            return false;
-        }
-
-        customer.IsDeleted = true;
-        customer.UpdatedAt = DateTime.UtcNow;
-        customer.UpdatedBy = userId;
-
-        await _context.SaveChangesAsync();
-
-        return true;
     }
 
 }

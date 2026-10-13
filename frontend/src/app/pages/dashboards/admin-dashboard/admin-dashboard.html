@@ -5,10 +5,6 @@
       <h1>Admin Dashboard</h1>
       <p>Welcome back, Admin 👋</p>
     </div>
-
-    <!-- <button class="action-btn">
-      + Add User
-    </button> -->
   </div>
 
   <!-- Statistics -->
@@ -25,7 +21,7 @@
         <div class="stat-info">
           <span>{{ stat.title }}</span>
           <h2>{{ stat.value }}</h2>
-          <small>{{ stat.change }} from last month</small>
+          <!-- <small>{{ stat.change }} from last month</small> -->
         </div>
 
       </div>
@@ -35,17 +31,17 @@
 
   <!-- Main Content -->
 
-  <div class="content-grid">
+   <div class="content-grid">
 
     <div class="card">
 
       <div class="card-header">
         <div>
           <h2>Recent Users</h2>
-          <p>Recently registered users</p>
+          <p>Recently registered Users</p>
         </div>
 
-        <button class="view-btn">View All</button>
+        <button routerLink="/admin/users" class="view-btn">View All</button>
       </div>
 
       <div class="table-container">
@@ -57,26 +53,16 @@
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Status</th>
             </tr>
           </thead>
 
           <tbody>
 
-            @for (user of recentUsers; track user.email) {
+            @for (c of users(); track c.id) {
               <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role }}</td>
-                <td>
-                  <span
-                    class="status"
-                    [class.active]="user.status === 'Active'"
-                    [class.inactive]="user.status === 'Inactive'"
-                  >
-                    {{ user.status }}
-                  </span>
-                </td>
+                <td>{{ c.name }}</td>
+                <td>{{ c.email }}</td>
+                <td>{{ c.role }}</td>
               </tr>
             }
 
@@ -134,6 +120,62 @@
             <small>2 hours ago</small>
           </div>
         </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="content-grid">
+
+    <div class="card">
+
+      <div class="card-header">
+        <div>
+          <h2>Recent Customer</h2>
+          <p>Recently registered Customer</p>
+        </div>
+
+        <button routerLink="/customers" class="view-btn">View All</button>
+      </div>
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (c of customers(); track c.id) {
+              <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.email }}</td>
+                <td>{{ c.address }}</td>
+                <td>
+                  <span
+                    class="status"
+                    [class.active]="c.isActive"
+                    [class.inactive]="!c.isActive"
+                  >
+                    {{ c.isActive ? 'Active' : 'InActive'}}
+                  </span>
+                </td>
+              </tr>
+            }
+
+          </tbody>
+
+        </table>
 
       </div>
 

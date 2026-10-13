@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { inject, Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CustomerDto, CreateCustomerDto, UpdateCustomerDto, CustomerResponse } from '../../model/Customer.model';
+import { PagedResult } from '../../model/pagination.model';
 
 
 @Injectable({
@@ -19,9 +20,15 @@ export class CustomerService {
         @Inject(PLATFORM_ID) private platformId: object
     ){}
 
-    getCustomers(): Observable<CustomerDto[]>{
-        return this.http.get<CustomerDto[]>(
-            `${this.url}`
+    getCustomers(
+        pageNumber: number = 1,
+        pageSize: number = 10
+    ): Observable<PagedResult<CustomerDto>>{
+        return this.http.get<PagedResult<CustomerDto>>(
+            `${this.url}`,
+            {
+                params: { pageNumber, pageSize }
+            }
         )
     }
     //Unnecessary

@@ -1,5 +1,6 @@
 ﻿using backend.DTOs;
 using backend.DTOs.CustomerDTOs;
+using backend.DTOs.Pagination;
 using backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,8 @@ using System.Security.Claims;
 
 namespace backend.Controller;
 
-[Authorize(Roles = "Admin,Accountant,Sales")]
+//[Authorize(Roles = "Admin,Accountant,Sales")]
+[Authorize]
 [ApiController]
 [Route("api/customer")]
 public class CustomerController : ControllerBase
@@ -21,9 +23,9 @@ public class CustomerController : ControllerBase
 
     // GET: api/customer
     [HttpGet]
-    public async Task<IActionResult> GetCustomers()
+    public async Task<IActionResult> GetCustomers([FromQuery] PaginationRequest request)
     {
-        var customers = await _service.GetCustomersAsync();
+        var customers = await _service.GetCustomersAsync(request);
 
         return Ok(customers);
     }
@@ -46,6 +48,7 @@ public class CustomerController : ControllerBase
     }
 
     // POST: api/customer
+    [Authorize(Roles = "Admin, Sales")]
     [HttpPost]
     public async Task<IActionResult> CreateCustomer(
         [FromBody] CreateCustomerDto dto)
@@ -78,6 +81,7 @@ public class CustomerController : ControllerBase
     }
 
     // PUT: api/customer/5
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCustomer(
         int id,
@@ -114,6 +118,7 @@ public class CustomerController : ControllerBase
     }
 
     // DELETE: api/customer/5
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCustomer(int id)
     {
