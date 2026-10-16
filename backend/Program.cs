@@ -1,10 +1,9 @@
-using backend.Service;
+using backend.Data;
 using backend.Interface;
 using backend.Repository;
-
-using Microsoft.EntityFrameworkCore;
-
+using backend.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -69,9 +68,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<InvoiceService>();
 
 //JWT
 var jwtkey = builder.Configuration["Jwt:Key"];
@@ -102,6 +103,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+
+    await DbSeeder.SeedAsync(
+        context,
+        scope.ServiceProvider
+            .GetRequiredService<IConfiguration>());
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

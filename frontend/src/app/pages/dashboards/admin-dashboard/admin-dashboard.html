@@ -11,7 +11,7 @@
 
   <div class="stats-grid">
 
-    @for (stat of stats; track stat.title) {
+    @for (stat of stats(); track stat.title) {
       <div class="stat-card">
 
         <div class="stat-icon" [class]="stat.type">
@@ -78,8 +78,8 @@
 
       <div class="card-header">
         <div>
-          <h2>System Activity</h2>
-          <p>Latest activities</p>
+          <h2>System Flow</h2>
+          <!-- <p>Latest activities</p> -->
         </div>
       </div>
 
@@ -88,36 +88,36 @@
         <div class="activity-item">
           <span class="dot green"></span>
           <div>
-            <strong>New user registered</strong>
-            <p>John Doe joined the system</p>
-            <small>5 minutes ago</small>
+            <strong>New user registeration</strong>
+            <p>Only admin have rights for CR </p>
+            <small>on user</small>
           </div>
         </div>
 
         <div class="activity-item">
           <span class="dot blue"></span>
           <div>
-            <strong>New order created</strong>
-            <p>Order #ORD-1024 was created</p>
-            <small>20 minutes ago</small>
+            <strong>User Page</strong>
+            <p>Show only on admin dashboard</p>
+            <small>Admin / Accountant / Sales</small>
           </div>
         </div>
 
         <div class="activity-item">
           <span class="dot orange"></span>
           <div>
-            <strong>Payment received</strong>
-            <p>$2,450 payment received</p>
-            <small>1 hour ago</small>
+            <strong>Customer Page</strong>
+            <p>Every user can see the page</p>
+            <small>Accountant just view the page</small>
           </div>
         </div>
 
         <div class="activity-item">
           <span class="dot red"></span>
           <div>
-            <strong>User account disabled</strong>
-            <p>Mike Johnson was disabled</p>
-            <small>2 hours ago</small>
+            <strong>Customer Page</strong>
+            <p>Only Admin have rights for CRUD</p>
+            <small>Sales can create a customer</small>
           </div>
         </div>
 

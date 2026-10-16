@@ -99,17 +99,17 @@ export class AuthService {
         return JSON.parse(user)
     }
     getRole(): string | null {
-    return this.getUser()?.role ?? null;
-  }
+        return this.getUser()?.role ?? null;
+    }
 
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
+    isLoggedIn(): boolean {
+        return !!this.getToken();
+    }
 
-  hasRole(...roles: string[]): boolean{
-    const role = this.getRole();
-    return !!role && roles.includes(role)
-  }
+    hasRole(...roles: string[]): boolean{
+        const role = this.getRole();
+        return !!role && roles.includes(role)
+    }
 
 //   logout(): void {
 //     localStorage.removeItem('token');

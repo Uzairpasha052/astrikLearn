@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { Router, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   imports: [FormsModule, CommonModule, RouterLink],
@@ -20,6 +21,8 @@ export class Login {
     private router: Router
   ){}
 
+  private toast = inject(ToastrService)
+
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
@@ -36,24 +39,45 @@ export class Login {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user))
 
-        
-        if(response.role === 'Admin'){
-          this.router.navigate(['/admin/dashboard'])
-        }
-        else if(response.role === 'Accountant'){
-          this.router.navigate(['/accountant/dashboard'])
-        }
-        else if(response.role === 'Sales'){
-          this.router.navigate(['/sales/dashboard'])
-        }
+        this.toast.success(
+          'Welcome Back! ',
+          'Login Successfull',
+          {
+            timeOut: 4000,
+          }
+        )
+
+        setTimeout(() => {
+          if(response.role === 'Admin'){
+            this.router.navigate(['/admin/dashboard'])
+          }
+          else if(response.role === 'Accountant'){
+            this.router.navigate(['/accountant/dashboard'])
+          }
+          else if(response.role === 'Sales'){
+            this.router.navigate(['/sales/dashboard'])
+          }
+        }, 4000)
         
       },
       error: (err) => {
         console.error('Login failed:', err);
+
+        const message =
+          typeof err.error === 'string'
+            ? err.error
+            : err.error?.message ||
+              err.error?.detail ||
+              'Invalid email or password. Please try again.';
+
+        this.toast.error(message, 'Login Failed', { enableHtml: false });
+        // this.toast.error(
+        //   'Login Failed', err
+        // )
+
       }
     })
 
   }
 
- 
 }

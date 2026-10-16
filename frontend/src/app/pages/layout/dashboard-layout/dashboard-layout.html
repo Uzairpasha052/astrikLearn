@@ -33,7 +33,7 @@
           class="nav-item"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <span class="nav-icon">▣</span>
+          <span class="nav-icon">⌂</span>
           <span class="nav-text">Dashboard</span>
         </a>
 
@@ -56,22 +56,31 @@
         </a>
 
         <a
+          routerLink="/invoices"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">Invoices</span>
+        </a>
+
+        <!-- <a
           routerLink="/admin/reports"
           routerLinkActive="active"
           class="nav-item"
         >
           <span class="nav-icon">📊</span>
           <span class="nav-text">Reports</span>
-        </a>
+        </a> -->
 
-        <a
+        <!-- <a
           routerLink="/admin/settings"
           routerLinkActive="active"
           class="nav-item"
         >
           <span class="nav-icon">⚙</span>
           <span class="nav-text">Settings</span>
-        </a>
+        </a> -->
 
       }
 
@@ -86,7 +95,7 @@
           class="nav-item"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <span class="nav-icon">▣</span>
+          <span class="nav-icon">⌂</span>
           <span class="nav-text">Dashboard</span>
         </a>
 
@@ -100,7 +109,7 @@
         </a>
 
         <a
-          routerLink="/accountant/invoices"
+          routerLink="/invoices"
           routerLinkActive="active"
           class="nav-item"
         >
@@ -108,23 +117,23 @@
           <span class="nav-text">Invoices</span>
         </a>
 
-        <a
+        <!-- <a
           routerLink="/accountant/expenses"
           routerLinkActive="active"
           class="nav-item"
         >
           <span class="nav-icon">💳</span>
           <span class="nav-text">Expenses</span>
-        </a>
+        </a> -->
 
-        <a
+        <!-- <a
           routerLink="/accountant/reports"
           routerLinkActive="active"
           class="nav-item"
         >
           <span class="nav-icon">📈</span>
           <span class="nav-text">Financial Reports</span>
-        </a>
+        </a> -->
 
       }
 
@@ -139,7 +148,7 @@
           class="nav-item"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <span class="nav-icon">▣</span>
+          <span class="nav-icon">⌂</span>
           <span class="nav-text">Dashboard</span>
         </a>
 
@@ -152,6 +161,15 @@
           <span class="nav-text">Customers/Lead</span>
         </a>
 
+        <a
+          routerLink="/invoices"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">Invoices</span>
+        </a>
+
         <!-- <a
           routerLink="/sales/leads"
           routerLinkActive="active"
@@ -161,14 +179,14 @@
           <span class="nav-text">Leads</span>
         </a> -->
 
-        <a
+        <!-- <a
           routerLink="/sales/deals"
           routerLinkActive="active"
           class="nav-item"
         >
           <span class="nav-icon">💼</span>
           <span class="nav-text">Deals</span>
-        </a>
+        </a> -->
 
       }
 
@@ -207,7 +225,7 @@
         </button>
 
         <div class="page-title">
-          Dashboard
+          Invoice & Payment Tracking
         </div>
 
       </div>

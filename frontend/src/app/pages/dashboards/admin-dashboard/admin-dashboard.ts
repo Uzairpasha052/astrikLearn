@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CustomerDto } from '../../../model/Customer.model';
 import { CustomerService } from '../../../services/customerService/customer-service';
 import { RouterLink } from '@angular/router';
@@ -37,9 +37,11 @@ export class AdminDashboard {
   ).subscribe({
     next: (data) => {
       this.customers.set(data.items);
-      this.currentPage.set(data.pageNumber);
+      this.totalCustomers.set(data.totalCount);
+
+      this.customersPage.set(data.pageNumber);
       this.totalCount.set(data.totalCount);
-      this.totalPages.set(data.totalPages);
+      this.customersTotalPages.set(data.totalPages);
       this.loading.set(false);
     },
     error: (err) => {
@@ -67,10 +69,16 @@ export class AdminDashboard {
   //   })
   // }
 
-  currentPage = signal(1);
+  // currentPage = signal(1);
   pageSize = signal(10);
   totalCount = signal(0);
-  totalPages = signal(0);
+  // totalPages = signal(0);
+
+  usersPage = signal(1);
+  usersTotalPages = signal(0);
+
+  customersPage = signal(1);
+  customersTotalPages = signal(0);
 
   loadUsers(page: number = 1): void {
   this.loading.set(true);
@@ -82,9 +90,11 @@ export class AdminDashboard {
   ).subscribe({
     next: (data) => {
       this.users.set(data.items);
-      this.currentPage.set(data.pageNumber);
+      this.totalUsers.set(data.totalCount);
+
+      this.usersPage.set(data.pageNumber);
       this.totalCount.set(data.totalCount);
-      this.totalPages.set(data.totalPages);
+      this.customersTotalPages.set(data.totalPages);
       this.loading.set(false);
     },
     error: () => {
@@ -95,14 +105,14 @@ export class AdminDashboard {
 }
 
 previousPage(): void {
-  if (this.currentPage() > 1) {
-    this.loadUsers(this.currentPage() - 1);
+  if (this.usersPage() > 1) {
+    this.loadUsers(this.usersPage() - 1);
   }
 }
 
 nextPage(): void {
-  if (this.currentPage() < this.totalPages()) {
-    this.loadUsers(this.currentPage() + 1);
+  if (this.usersPage() < this.customersTotalPages()) {
+    this.loadUsers(this.usersPage() + 1);
   }
 }
 
@@ -135,23 +145,26 @@ nextPage(): void {
   //   })
   // }
 
+  totalUsers = signal(0)
+  totalCustomers = signal(0)
 
-
-   stats = [
+   stats = computed(() => [
     {
       title: 'Total Users',
-      value: '1,248',
+      // value: '1,248',
+      value: this.totalUsers().toLocaleString(),
       change: '+12.5%',
       type: 'users'
     },
     {
       title: 'Total Customers',
-      value: '$84,520',
+      // value: '$84,520',
+      value: this.totalCustomers().toLocaleString(),
       change: '+8.2%',
       type: 'sales'
     },
     {
-      title: 'Total Orders',
+      title: 'Total Invoices',
       value: '3,642',
       change: '+15.3%',
       type: 'orders'
@@ -162,6 +175,6 @@ nextPage(): void {
       change: '+10.8%',
       type: 'revenue'
     }
-  ];
+  ]);
 
 }

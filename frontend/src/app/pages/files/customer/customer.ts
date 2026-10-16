@@ -3,6 +3,7 @@ import { CustomerService } from '../../../services/customerService/customer-serv
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomerDto, CustomerResponse } from '../../../model/Customer.model';
 import { AuthService } from '../../../services/auth-service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class Customer {
     ){}
     private fb = inject(FormBuilder);
     private authService = inject(AuthService)
+    private toast = inject(ToastrService)
 
     canCreate = this.authService.hasRole('Admin', 'Sales')
     canEditDelete = this.authService.hasRole('Admin')
@@ -128,12 +130,26 @@ export class Customer {
       request$.subscribe({
         next: (res) => {
           this.successMessage.set(res.message)
+          this.toast.success(
+            res.message || 'Customer saved successfully',
+            'Success',
+            { timeOut: 4000 }
+          );
           this.saving.set(false)
           this.closeForm()
           this.loadCustomers()
         },
         error: (err) => {
-          this.errorMessage.set(err?.error?.message ?? "Failed to save Cutomer")
+          const message =
+            typeof err?.error?.message === 'string'
+              ? err.error.message
+              : 'Failed to save customer';
+
+          this.errorMessage.set(message)
+          this.toast.error(message, 'Error', {
+            timeOut: 4000
+          });
+
           this.saving.set(false)
         }
       })

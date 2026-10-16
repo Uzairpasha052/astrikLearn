@@ -36,7 +36,7 @@ public class CustomerService
             })
             .ToList(),
 
-            TotalCount = customers.Items.Count(c => !c.IsDeleted),
+            TotalCount = customers.TotalCount,
             PageNumber = customers.PageNumber,
             PageSize = customers.PageSize
         };

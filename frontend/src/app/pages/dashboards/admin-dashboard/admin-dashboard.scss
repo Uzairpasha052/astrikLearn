@@ -46,6 +46,13 @@
   margin-bottom: 25px;
 }
 
+.card{
+  height: 350px;
+  overflow-y: auto;
+
+  scrollbar-width: none;
+}
+
 .stat-card {
   background: white;
   border-radius: 12px;
@@ -187,6 +194,13 @@ td {
 }
 
 /* Activity */
+.activity {
+  height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: none;
+}
 
 .activity-item {
   display: flex;

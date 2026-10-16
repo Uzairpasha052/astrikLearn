@@ -10,6 +10,7 @@ import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role/role-guard';
 import { User } from './pages/files/user/user';
 import { Customer } from './pages/files/customer/customer';
+import { Invoice } from './pages/files/invoice/invoice';
 
 
 export const routes: Routes = [
@@ -27,6 +28,8 @@ export const routes: Routes = [
         path: 'unauthorized',
         component: Unauthorized
     },
+
+    //Common Pages 
     {
         path: 'customers',
         component: DashboardLayout,
@@ -40,6 +43,22 @@ export const routes: Routes = [
             }
         ]
     },
+    {
+        path: 'invoices',
+        component: DashboardLayout,
+        canActivate: [authGuard, roleGuard],
+        data: {
+            roles: ['Admin', 'Accountant', 'Sales']
+        },
+        children: [
+            {
+                path: '', component: Invoice
+            }
+        ]
+    },
+
+
+    //Restricted Pages
     {
         path: 'admin',
         component: DashboardLayout,

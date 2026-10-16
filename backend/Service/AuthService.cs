@@ -88,20 +88,20 @@ public class AuthService
 
     }
 
-    public async Task<List<UserDisplayDto>> UserDisplayAsync()
-    {
+    //public async Task<List<UserDisplayDto>> UserDisplayAsync()
+    //{
 
-        var user = await _context.GetAllAsync();
-        return user
-            .Select(u => new UserDisplayDto
-            {
-                Id = u.Id,
-                Name = u.Name,
-                Email = u.Mail,
-                Role = u.Role.Name ?? string.Empty,
-                Date = u.CreatedAt 
-            } ).ToList();
-    }
+    //    var user = await _context.GetAllAsync();
+    //    return user
+    //        .Select(u => new UserDisplayDto
+    //        {
+    //            Id = u.Id,
+    //            Name = u.Name,
+    //            Email = u.Mail,
+    //            Role = u.Role.Name ?? string.Empty,
+    //            Date = u.CreatedAt 
+    //        } ).ToList();
+    //}
 
 
     public async Task<PagedResult<UserDisplayDto>> UserDisplayAsync(
