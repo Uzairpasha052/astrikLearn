@@ -1,61 +1,71 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { InvoiceService } from '../../../services/invoiceService/invoice.service';
+import { CustomerService } from '../../../services/customerService/customer-service';
+import { InvoiceDisplayDto } from '../../../model/Invoice.model';
+import { CustomerDto } from '../../../model/Customer.model';
 
 @Component({
-  imports: [],
   selector: 'app-sales-dashboard',
-  styleUrl: './sales-dashboard.scss',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
   templateUrl: './sales-dashboard.html',
+  styleUrl: './sales-dashboard.scss'
 })
-export class SalesDashboard {
+export class SalesDashboard implements OnInit {
+  private invoiceService = inject(InvoiceService);
+  private customerService = inject(CustomerService);
 
-  stats = [
-    {
-      title: 'Total Sales',
-      value: '$84,520',
-      change: '+18.2%'
-    },
-    {
-      title: 'New Leads',
-      value: '186',
-      change: '+24.5%'
-    },
-    {
-      title: 'Customers',
-      value: '842',
-      change: '+12.8%'
-    },
-    {
-      title: 'Deals Won',
-      value: '64',
-      change: '+15.4%'
-    }
-  ];
+  loading = signal(true);
+  invoices = signal<InvoiceDisplayDto[]>([]);
+  customers = signal<CustomerDto[]>([]);
 
-  deals = [
-    {
-      customer: 'ABC Corporation',
-      deal: 'Enterprise Plan',
-      value: '$12,500',
-      status: 'Won'
-    },
-    {
-      customer: 'Tech Solutions',
-      deal: 'Business Plan',
-      value: '$7,800',
-      status: 'Negotiation'
-    },
-    {
-      customer: 'Global Traders',
-      deal: 'Enterprise Plan',
-      value: '$15,200',
-      status: 'Won'
-    },
-    {
-      customer: 'XYZ Limited',
-      deal: 'Starter Plan',
-      value: '$3,200',
-      status: 'Pending'
-    }
-  ];
-  
+  totalSalesValue = signal(0);
+  totalInvoicesCount = signal(0);
+  activeAccounts = signal(0);
+  pendingRevenue = signal(0);
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(): void {
+    this.loading.set(true);
+
+    this.invoiceService.getInvoices(1, 100).subscribe({
+      next: (res) => {
+        this.invoices.set(res.items.slice(0, 6));
+        this.totalInvoicesCount.set(res.totalCount);
+
+        let total = 0;
+        let pending = 0;
+
+        res.items.forEach((i) => {
+          total += i.totalAmount;
+          pending += i.outstandingAmount;
+        });
+
+        this.totalSalesValue.set(total);
+        this.pendingRevenue.set(pending);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      }
+    });
+
+    this.customerService.getCustomers(1, 10).subscribe({
+      next: (res) => {
+        this.customers.set(res.items.filter((c) => c.isActive));
+        this.activeAccounts.set(res.totalCount);
+      },
+      error: () => {}
+    });
+  }
+
+  avgDealSize = computed(() => {
+    if (this.totalInvoicesCount() === 0) return 0;
+    return Math.round(this.totalSalesValue() / this.totalInvoicesCount());
+  });
 }

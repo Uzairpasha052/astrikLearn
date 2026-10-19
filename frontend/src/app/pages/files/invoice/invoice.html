@@ -1,1 +1,509 @@
-<p>invoice works!</p>
+<div class="invoice-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="badge-tag">FINANCIAL MANAGEMENT</div>
+      <h1>Invoices & Receivables</h1>
+      <p>Issue, monitor, and track customer billing with aging analysis and risk intelligence.</p>
+    </div>
+
+    <div class="header-actions">
+      @if (canCreate) {
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <span class="btn-icon">+</span> Create Invoice
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- CONTROL & FILTER BAR -->
+  <div class="filters-card">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search invoice number or customer..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      />
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-item">
+        <label>Status:</label>
+        <select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+          <option value="ALL">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Partially Paid">Partially Paid</option>
+          <option value="Paid">Paid</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Aging Bucket:</label>
+        <select [ngModel]="selectedAging()" (ngModelChange)="selectedAging.set($event)">
+          <option value="ALL">All Buckets</option>
+          <option value="Current">Current (Due Soon)</option>
+          <option value="1-30 Days">1 - 30 Days Overdue</option>
+          <option value="31-60 Days">31 - 60 Days Overdue</option>
+          <option value="60+ Days">60+ Days Overdue</option>
+          <option value="Paid">Settled / Paid</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA TABLE CARD -->
+  <div class="table-card">
+    <div class="table-header-info">
+      <h3>Invoice Ledger</h3>
+      <span class="count-tag">{{ filteredInvoices().length }} Records Found</span>
+    </div>
+
+    <div class="table-responsive">
+      @if (loading()) {
+        <div class="loader-state">
+          <div class="spinner"></div>
+          <p>Retrieving invoices from ledger...</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Customer</th>
+              <th>Issue Date</th>
+              <th>Due Date</th>
+              <th>Aging</th>
+              <th class="text-right">Total Amount</th>
+              <th class="text-right">Paid</th>
+              <th class="text-right">Balance Due</th>
+              <th>Status</th>
+              <th class="text-center">AI Risk</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (inv of filteredInvoices(); track inv.id) {
+              <tr>
+                <td class="font-bold text-primary">
+                  <a (click)="viewDetails(inv)" class="inv-link">{{ inv.invoiceNumber }}</a>
+                </td>
+                <td>
+                  <div class="customer-cell">
+                    <span class="avatar-small">{{ inv.customerName.charAt(0) || 'C' }}</span>
+                    <span>{{ inv.customerName }}</span>
+                  </div>
+                </td>
+                <td class="text-muted">{{ inv.invoiceDate }}</td>
+                <td class="text-muted">{{ inv.dueDate }}</td>
+                <td>
+                  <span class="aging-badge" [class]="getAgingClass(inv)">
+                    {{ getAgingBucket(inv) }}
+                  </span>
+                </td>
+                <td class="text-right font-medium">
+                  ${{ inv.totalAmount | number: '1.2-2' }}
+                </td>
+                <td class="text-right text-success font-medium">
+                  ${{ inv.amountPaid | number: '1.2-2' }}
+                </td>
+                <td class="text-right font-bold" [class.text-danger]="inv.outstandingAmount > 0">
+                  ${{ inv.outstandingAmount | number: '1.2-2' }}
+                </td>
+                <td>
+                  <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
+                    {{ inv.status }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <button
+                    class="btn-icon-ai"
+                    title="Assess AI Risk"
+                    (click)="assessRisk(inv)"
+                  >
+                    ✦ Risk
+                  </button>
+                </td>
+                <td class="text-right">
+                  <div class="action-buttons">
+                    <button class="btn-sm btn-outline" (click)="viewDetails(inv)" title="View Receipt">
+                      👁
+                    </button>
+
+                    @if (canEditDelete) {
+                      <button
+                        class="btn-sm btn-outline"
+                        [disabled]="inv.amountPaid > 0"
+                        [title]="inv.amountPaid > 0 ? 'Cannot edit invoice with paid balance' : 'Edit Invoice'"
+                        (click)="openEditModal(inv)"
+                      >
+                        ✏
+                      </button>
+
+                      <button
+                        class="btn-sm btn-danger-outline"
+                        [disabled]="inv.amountPaid > 0"
+                        [title]="inv.amountPaid > 0 ? 'Cannot delete invoice with payments' : 'Delete Invoice'"
+                        (click)="confirmDelete(inv)"
+                      >
+                        🗑
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="11" class="empty-state">
+                  <div class="empty-box">
+                    <span class="empty-icon">📄</span>
+                    <h4>No invoices found</h4>
+                    <p>No invoices matched your filter criteria or none have been issued yet.</p>
+                    @if (canCreate) {
+                      <button class="btn btn-primary" (click)="openCreateModal()">Create Your First Invoice</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-footer">
+      <span class="text-muted">
+        Showing Page {{ currentPage() }} of {{ totalPages() || 1 }} ({{ totalCount() }} total)
+      </span>
+
+      <div class="pagination-btns">
+        <button
+          class="btn-page"
+          [disabled]="currentPage() <= 1 || loading()"
+          (click)="goToPage(currentPage() - 1)"
+        >
+          Previous
+        </button>
+        <button class="btn-page active">{{ currentPage() }}</button>
+        <button
+          class="btn-page"
+          [disabled]="currentPage() >= totalPages() || loading()"
+          (click)="goToPage(currentPage() + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE / EDIT INVOICE -->
+  @if (showFormModal()) {
+    <div class="modal-backdrop" (click)="closeFormModal()">
+      <div class="modal-window modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>{{ editingInvoiceId() ? 'Edit Invoice' : 'Create New Invoice' }}</h2>
+            <p class="modal-sub">Add customer details, due dates, and line items.</p>
+          </div>
+          <button class="btn-close" (click)="closeFormModal()">✕</button>
+        </div>
+
+        <form [formGroup]="invoiceForm" (ngSubmit)="submitInvoice()" class="modal-body">
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label>Select Customer <span class="required">*</span></label>
+              <select formControlName="customerId" class="form-control">
+                <option [ngValue]="0" disabled>-- Choose a Customer --</option>
+                @for (c of customers(); track c.id) {
+                  <option [ngValue]="c.id">{{ c.name }} ({{ c.email || 'No email' }})</option>
+                }
+              </select>
+              @if (invoiceForm.controls.customerId.touched && invoiceForm.controls.customerId.invalid) {
+                <small class="error-text">Please select a valid customer</small>
+              }
+            </div>
+
+            <div class="form-group flex-1">
+              <label>Invoice Date <span class="required">*</span></label>
+              <input type="date" formControlName="invoiceDate" class="form-control" />
+            </div>
+
+            <div class="form-group flex-1">
+              <label>Due Date <span class="required">*</span></label>
+              <input type="date" formControlName="dueDate" class="form-control" />
+            </div>
+          </div>
+
+          <!-- LINE ITEMS BUILDER -->
+          <div class="line-items-section">
+            <div class="section-title-row">
+              <h4>Invoice Items & Quantities</h4>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="addItem()">
+                + Add Item
+              </button>
+            </div>
+
+            <div class="items-table-wrapper">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50%;">Item Description</th>
+                    <th style="width: 15%;">Quantity</th>
+                    <th style="width: 20%;">Unit Price ($)</th>
+                    <th style="width: 10%;" class="text-right">Total</th>
+                    <th style="width: 5%;"></th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="items">
+                  @for (item of itemsFormArray.controls; track $index) {
+                    <tr [formGroupName]="$index">
+                      <td>
+                        <input
+                          type="text"
+                          formControlName="description"
+                          placeholder="e.g. Software Development Services"
+                          class="form-control"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          formControlName="quantity"
+                          min="0.01"
+                          step="1"
+                          class="form-control"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          formControlName="unitPrice"
+                          min="0.01"
+                          step="0.01"
+                          class="form-control"
+                        />
+                      </td>
+                      <td class="text-right font-medium">
+                        ${{ getItemLineTotal($index) | number: '1.2-2' }}
+                      </td>
+                      <td class="text-center">
+                        <button
+                          type="button"
+                          class="btn-remove"
+                          (click)="removeItem($index)"
+                          title="Remove item"
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="grand-total-card">
+              <div class="total-row">
+                <span>Subtotal:</span>
+                <strong>${{ getCalculatedGrandTotal() | number: '1.2-2' }}</strong>
+              </div>
+              <div class="total-row grand">
+                <span>Total Invoice Balance:</span>
+                <span class="total-amount">${{ getCalculatedGrandTotal() | number: '1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeFormModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="saving()">
+              {{ saving() ? 'Saving Invoice...' : (editingInvoiceId() ? 'Update Invoice' : 'Create & Issue') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: INVOICE DETAILS & RECEIPT -->
+  @if (showDetailModal() && selectedInvoice()) {
+    <div class="modal-backdrop" (click)="closeDetailModal()">
+      <div class="modal-window modal-md invoice-receipt" (click)="$event.stopPropagation()">
+        <div class="modal-header receipt-header">
+          <div>
+            <span class="receipt-badge">TAX INVOICE</span>
+            <h2>{{ selectedInvoice()!.invoiceNumber }}</h2>
+            <p class="text-muted">Issued on {{ selectedInvoice()!.invoiceDate }}</p>
+          </div>
+          <button class="btn-close" (click)="closeDetailModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="receipt-grid">
+            <div class="receipt-box">
+              <span class="box-label">Billed To</span>
+              <strong>{{ selectedInvoice()!.customerName }}</strong>
+              <small>Customer Account #{{ selectedInvoice()!.customerId }}</small>
+            </div>
+            <div class="receipt-box text-right">
+              <span class="box-label">Payment Due Date</span>
+              <strong class="text-danger">{{ selectedInvoice()!.dueDate }}</strong>
+              <span class="status-pill" [class]="selectedInvoice()!.status.toLowerCase().replace(' ', '-')">
+                {{ selectedInvoice()!.status }}
+              </span>
+            </div>
+          </div>
+
+          <h4 class="receipt-subheading">Purchased Items & Deliverables</h4>
+          <table class="receipt-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th class="text-center">Qty</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of selectedInvoice()!.items; track item.id) {
+                <tr>
+                  <td>{{ item.description }}</td>
+                  <td class="text-center">{{ item.quantity }}</td>
+                  <td class="text-right">${{ item.unitPrice | number: '1.2-2' }}</td>
+                  <td class="text-right">${{ (item.amount || (item.quantity * item.unitPrice)) | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="receipt-summary">
+            <div class="summary-line">
+              <span>Total Invoice Amount:</span>
+              <span>${{ selectedInvoice()!.totalAmount | number: '1.2-2' }}</span>
+            </div>
+            <div class="summary-line text-success">
+              <span>Allocated / Paid Amount:</span>
+              <span>${{ selectedInvoice()!.amountPaid | number: '1.2-2' }}</span>
+            </div>
+            <div class="summary-line total-due">
+              <span>Remaining Balance:</span>
+              <span class="due-amount">${{ selectedInvoice()!.outstandingAmount | number: '1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline" (click)="closeDetailModal()">Close</button>
+          <button class="btn btn-primary" (click)="assessRisk(selectedInvoice()!)">
+            ✦ AI Risk Intelligence
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: AI RISK EVALUATION -->
+  @if (showAiModal() && selectedAiRisk()) {
+    <div class="modal-backdrop" (click)="closeAiModal()">
+      <div class="modal-window modal-md" (click)="$event.stopPropagation()">
+        <div class="modal-header ai-header">
+          <div>
+            <div class="ai-badge">✦ LOCAL ADVISORY INTELLIGENCE</div>
+            <h2>Late-Payment Risk Scoring</h2>
+            <p>Invoice #{{ selectedAiRisk()!.invoiceNumber }} &bull; {{ selectedAiRisk()!.customerName }}</p>
+          </div>
+          <button class="btn-close" (click)="closeAiModal()">✕</button>
+        </div>
+
+        <div class="modal-body ai-body">
+          <div class="risk-score-display">
+            <div class="score-circle" [class]="selectedAiRisk()!.riskLevel.toLowerCase()">
+              <span class="score-num">{{ selectedAiRisk()!.score }}</span>
+              <span class="score-lbl">Risk Score</span>
+            </div>
+
+            <div class="score-details">
+              <div class="risk-tag" [class]="selectedAiRisk()!.riskLevel.toLowerCase()">
+                {{ selectedAiRisk()!.riskLevel }} Risk
+              </div>
+              <p class="confidence-text">
+                Confidence Level: <strong>{{ selectedAiRisk()!.confidence }}%</strong>
+              </p>
+              <p class="aging-text">
+                Invoice Age Status: <strong>{{ selectedAiRisk()!.daysOverdue }} days past due</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Explainable Risk Factors -->
+          <div class="explainability-card">
+            <h4>Explainable Risk Factors</h4>
+            <div class="factors-list">
+              @for (f of selectedAiRisk()!.factors; track f.factor) {
+                <div class="factor-item" [class]="f.impact">
+                  <span class="factor-badge">{{ f.impact | uppercase }}</span>
+                  <div>
+                    <strong>{{ f.factor }}</strong>
+                    <p>{{ f.detail }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Advisory Action -->
+          <div class="advisory-card">
+            <div class="advisory-icon">💡</div>
+            <div>
+              <strong>Advisory Recommendation</strong>
+              <p>{{ selectedAiRisk()!.recommendedAction }}</p>
+              <small class="text-muted">Advisory only. User remains responsible for final decision.</small>
+            </div>
+          </div>
+
+          <div class="audit-action-row">
+            <p class="text-muted text-sm">Store assessment in compliance audit trail:</p>
+            <div class="button-group">
+              <button class="btn btn-outline" (click)="confirmAiAudit('Low')">Mark as Low Risk</button>
+              <button class="btn btn-outline" (click)="confirmAiAudit('Medium')">Mark as Medium</button>
+              <button class="btn btn-primary" (click)="confirmAiAudit()">Confirm & Save Audit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: DELETE CONFIRMATION -->
+  @if (showDeleteModal() && invoiceToDelete()) {
+    <div class="modal-backdrop" (click)="cancelDelete()">
+      <div class="modal-window modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Confirm Deletion</h2>
+          <button class="btn-close" (click)="cancelDelete()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Are you sure you want to soft-delete invoice <strong>{{ invoiceToDelete()!.invoiceNumber }}</strong>?
+          </p>
+          <p class="text-muted text-sm">
+            This action marks the invoice as inactive. Invoices with payment records cannot be deleted.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+          <button class="btn btn-danger" [disabled]="deletingId() !== null" (click)="executeDelete()">
+            {{ deletingId() ? 'Deleting...' : 'Delete Invoice' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

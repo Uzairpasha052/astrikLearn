@@ -1,274 +1,160 @@
-<div class="layout" [class.sidebar-closed]="!sidebarOpen">
+<div class="layout" [class.sidebar-closed]="!sidebarOpen()">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
 
-    <!-- Logo -->
+    <!-- Brand Logo -->
     <div class="sidebar-logo">
-
-      <div class="logo-icon">
-        I
+      <div class="logo-icon">INV</div>
+      <div class="logo-text">
+        <span class="brand-name">Invoisly</span>
+        <span class="brand-sub">Finance Suite</span>
       </div>
-
-      <span>Invoice App</span>
-
     </div>
 
-
-    <!-- Navigation -->
+    <!-- Navigation Menu -->
     <nav class="navigation">
+      <p class="menu-title">CORE OPERATIONS</p>
 
-      <p class="menu-title">
-        MAIN MENU
-      </p>
+      <a
+        [routerLink]="getDashboardLink()"
+        routerLinkActive="active"
+        class="nav-item"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">Dashboard</span>
+      </a>
 
+      <a
+        routerLink="/invoices"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="nav-icon">📄</span>
+        <span class="nav-text">Invoices</span>
+      </a>
 
-      <!-- ================= ADMIN ================= -->
+      <a
+        routerLink="/payments"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="nav-icon">💳</span>
+        <span class="nav-text">Payments & Allocations</span>
+      </a>
 
-      @if (user?.role === 'Admin') {
+      <a
+        routerLink="/customers"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="nav-icon">👥</span>
+        <span class="nav-text">Customers</span>
+      </a>
 
-        <a
-          routerLink="/admin/dashboard"
-          routerLinkActive="active"
-          class="nav-item"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="nav-icon">⌂</span>
-          <span class="nav-text">Dashboard</span>
-        </a>
+      <a
+        routerLink="/reminders"
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        <span class="nav-icon">🔔</span>
+        <span class="nav-text">Payment Reminders</span>
+      </a>
+
+      <p class="menu-title">FINANCIAL INTELLIGENCE</p>
+
+      <a
+        routerLink="/intelligence"
+        routerLinkActive="active"
+        class="nav-item nav-ai"
+      >
+        <span class="nav-icon">✦</span>
+        <span class="nav-text">AI Risk Intelligence</span>
+      </a>
+
+      <!-- ADMIN RESTRICTED SECTION -->
+      @if (user()?.role === 'Admin') {
+        <p class="menu-title">ADMINISTRATION</p>
 
         <a
           routerLink="/admin/users"
           routerLinkActive="active"
           class="nav-item"
         >
-          <span class="nav-icon">👥</span>
-          <span class="nav-text">Users</span>
-        </a>
-        
-        <a
-          routerLink="/customers"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">👥</span>
-          <span class="nav-text">Customers</span>
+          <span class="nav-icon">🛡</span>
+          <span class="nav-text">User Directory</span>
         </a>
 
         <a
-          routerLink="/invoices"
+          routerLink="/admin/register"
           routerLinkActive="active"
           class="nav-item"
         >
-          <span class="nav-icon">💰</span>
-          <span class="nav-text">Invoices</span>
+          <span class="nav-icon">➕</span>
+          <span class="nav-text">Register User</span>
         </a>
-
-        <!-- <a
-          routerLink="/admin/reports"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">📊</span>
-          <span class="nav-text">Reports</span>
-        </a> -->
-
-        <!-- <a
-          routerLink="/admin/settings"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">⚙</span>
-          <span class="nav-text">Settings</span>
-        </a> -->
-
       }
-
-
-      <!-- ================= ACCOUNTANT ================= -->
-
-      @if (user?.role === 'Accountant') {
-
-        <a
-          routerLink="/accountant/dashboard"
-          routerLinkActive="active"
-          class="nav-item"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="nav-icon">⌂</span>
-          <span class="nav-text">Dashboard</span>
-        </a>
-
-        <a
-          routerLink="/customers"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">👥</span>
-          <span class="nav-text">Customers</span>
-        </a>
-
-        <a
-          routerLink="/invoices"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">💰</span>
-          <span class="nav-text">Invoices</span>
-        </a>
-
-        <!-- <a
-          routerLink="/accountant/expenses"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">💳</span>
-          <span class="nav-text">Expenses</span>
-        </a> -->
-
-        <!-- <a
-          routerLink="/accountant/reports"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">📈</span>
-          <span class="nav-text">Financial Reports</span>
-        </a> -->
-
-      }
-
-
-      <!-- ================= SALES ================= -->
-
-      @if (user?.role === 'Sales') {
-
-        <a
-          routerLink="/sales/dashboard"
-          routerLinkActive="active"
-          class="nav-item"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="nav-icon">⌂</span>
-          <span class="nav-text">Dashboard</span>
-        </a>
-
-        <a
-          routerLink="/customers"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">👥</span>
-          <span class="nav-text">Customers/Lead</span>
-        </a>
-
-        <a
-          routerLink="/invoices"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">💰</span>
-          <span class="nav-text">Invoices</span>
-        </a>
-
-        <!-- <a
-          routerLink="/sales/leads"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">🎯</span>
-          <span class="nav-text">Leads</span>
-        </a> -->
-
-        <!-- <a
-          routerLink="/sales/deals"
-          routerLinkActive="active"
-          class="nav-item"
-        >
-          <span class="nav-icon">💼</span>
-          <span class="nav-text">Deals</span>
-        </a> -->
-
-      }
-
     </nav>
 
-
-    <!-- Bottom -->
+    <!-- Sidebar Footer / Current User Profile -->
     <div class="sidebar-bottom">
+      <div class="user-brief">
+        <div class="user-avatar">
+          {{ user()?.name?.charAt(0) || 'U' }}
+        </div>
+        <div class="user-details">
+          <strong class="user-name">{{ user()?.name || 'Staff User' }}</strong>
+          <span class="user-role-badge" [class]="user()?.role?.toLowerCase()">{{ user()?.role || 'User' }}</span>
+        </div>
+      </div>
 
-      <button
-        class="logout-btn"
-        (click)="logout()"
-      >
-        <span class="nav-icon">↪</span>
-        <span class="nav-text">Logout</span>
+      <button class="logout-btn" (click)="logout()" title="Sign out of system">
+        <span class="nav-icon">🚪</span>
+        <span class="nav-text">Sign Out</span>
       </button>
-
     </div>
 
   </aside>
 
-
-  <!-- MAIN AREA -->
+  <!-- MAIN VIEWPORT -->
   <div class="main-area">
 
     <!-- TOPBAR -->
     <header class="topbar">
-
       <div class="topbar-left">
-
-        <button
-          class="menu-toggle"
-          (click)="toggleSidebar()"
-        >
+        <button class="menu-toggle" (click)="toggleSidebar()" title="Toggle Menu Sidebar">
           ☰
         </button>
 
-        <div class="page-title">
-          Invoice & Payment Tracking
+        <div class="brand-breadcrumbs">
+          <span class="company-tag">Finance ERP</span>
+          <span class="divider">/</span>
+          <span class="current-scope">Invoice & Payment Tracking System</span>
         </div>
-
       </div>
-
 
       <div class="topbar-right">
-
-        <!-- <button class="notification-btn">
-          🔔
-          <span class="notification-dot"></span>
-        </button> -->
-
-
-        <div class="user-profile">
-
-          <div class="avatar">
-            {{ user?.name?.charAt(0) || 'U' }}
-          </div>
-
-          <div class="user-info">
-
-            <strong>
-              {{ user?.name || 'User' }}
-            </strong>
-
-            <span>
-              {{ user?.role || 'User' }}
-            </span>
-
-          </div>
-
+        <div class="quick-status">
+          <span class="status-indicator"></span>
+          <span class="status-text">Core API Connected</span>
         </div>
 
+        <div class="user-chip">
+          <div class="chip-avatar">
+            {{ user()?.name?.charAt(0) || 'U' }}
+          </div>
+          <div class="chip-info">
+            <span class="chip-name">{{ user()?.name || 'User' }}</span>
+            <small class="chip-role">{{ user()?.role }}</small>
+          </div>
+        </div>
       </div>
-
     </header>
 
-
-    <!-- CHILD PAGE -->
+    <!-- CONTENT OUTLET -->
     <main class="content">
-
       <router-outlet></router-outlet>
-
     </main>
 
   </div>

@@ -15,7 +15,7 @@ public class CreatePaymentDto
     public decimal Amount { get; set; }
 
     [StringLength(50)]
-    public string? PatmentMethod { get; set; }
+    public string? PaymentMethod { get; set; }
 
     [StringLength(50)]
     public string? ReferenceNumber { get; set; }

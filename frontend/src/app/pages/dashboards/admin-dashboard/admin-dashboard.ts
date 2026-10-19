@@ -1,180 +1,151 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { CustomerDto } from '../../../model/Customer.model';
-import { CustomerService } from '../../../services/customerService/customer-service';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { CustomerService } from '../../../services/customerService/customer-service';
+import { InvoiceService } from '../../../services/invoiceService/invoice.service';
+import { PaymentService } from '../../../services/paymentService/payment.service';
 import { AuthService, UserDisplay } from '../../../services/auth-service';
+import { CustomerDto } from '../../../model/Customer.model';
+import { InvoiceDisplayDto } from '../../../model/Invoice.model';
 
 @Component({
-  imports: [RouterLink],
   selector: 'app-admin-dashboard',
-  styleUrl: './admin-dashboard.scss',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
   templateUrl: './admin-dashboard.html',
+  styleUrl: './admin-dashboard.scss'
 })
-export class AdminDashboard {
+export class AdminDashboard implements OnInit {
+  private customerService = inject(CustomerService);
+  private invoiceService = inject(InvoiceService);
+  private paymentService = inject(PaymentService);
+  private authService = inject(AuthService);
 
-  private customerService = inject(CustomerService)
-  private authService = inject(AuthService)
+  loading = signal(true);
 
-  users = signal<UserDisplay[]>([])
-  customers = signal<CustomerDto[]>([])
-  loading = signal(false)
-  saving = signal(false);
-  errorMessage = signal('');
-  successMessage = signal('');
+  users = signal<UserDisplay[]>([]);
+  customers = signal<CustomerDto[]>([]);
+  invoices = signal<InvoiceDisplayDto[]>([]);
 
-  ngOnInit(){
-    this.loadCustomers()
-    this.loadUsers()
+  totalUsers = signal(0);
+  totalCustomers = signal(0);
+  totalInvoicesCount = signal(0);
+  totalRevenue = signal(0);
+  totalCollected = signal(0);
+  totalOutstanding = signal(0);
+  overdueCount = signal(0);
+
+  // Aging buckets
+  agingCurrent = signal(0);
+  aging1To30 = signal(0);
+  aging31To60 = signal(0);
+  aging60Plus = signal(0);
+
+  ngOnInit(): void {
+    this.loadAllData();
   }
 
-  loadCustomers(page: number = 1): void {
-  this.loading.set(true);
-  this.errorMessage.set('');
+  loadAllData(): void {
+    this.loading.set(true);
 
-  this.customerService.getCustomers(
-    page,
-    this.pageSize()
-  ).subscribe({
-    next: (data) => {
-      this.customers.set(data.items);
-      this.totalCustomers.set(data.totalCount);
+    // 1. Load users
+    this.authService.getLoginUser(1, 10).subscribe({
+      next: (res) => {
+        this.users.set(res.items);
+        this.totalUsers.set(res.totalCount);
+      },
+      error: () => {}
+    });
 
-      this.customersPage.set(data.pageNumber);
-      this.totalCount.set(data.totalCount);
-      this.customersTotalPages.set(data.totalPages);
-      this.loading.set(false);
-    },
-    error: (err) => {
-      this.errorMessage.set(
-        err?.error?.message ?? 'Failed to load customers'
-      );
-      this.loading.set(false);
-    }
+    // 2. Load customers
+    this.customerService.getCustomers(1, 10).subscribe({
+      next: (res) => {
+        this.customers.set(res.items);
+        this.totalCustomers.set(res.totalCount);
+      },
+      error: () => {}
+    });
+
+    // 3. Load invoices & compute financial analytics
+    this.invoiceService.getInvoices(1, 100).subscribe({
+      next: (res) => {
+        const items = res.items;
+        this.invoices.set(items.slice(0, 6)); // top recent
+        this.totalInvoicesCount.set(res.totalCount);
+
+        let rev = 0;
+        let col = 0;
+        let out = 0;
+        let overdue = 0;
+
+        let bCurrent = 0;
+        let b130 = 0;
+        let b3160 = 0;
+        let b60Plus = 0;
+
+        const today = new Date();
+
+        items.forEach((inv) => {
+          rev += inv.totalAmount;
+          col += inv.amountPaid;
+          out += inv.outstandingAmount;
+
+          if (inv.outstandingAmount > 0) {
+            const due = new Date(inv.dueDate);
+            const diffDays = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 0) {
+              bCurrent += inv.outstandingAmount;
+            } else if (diffDays <= 30) {
+              overdue++;
+              b130 += inv.outstandingAmount;
+            } else if (diffDays <= 60) {
+              overdue++;
+              b3160 += inv.outstandingAmount;
+            } else {
+              overdue++;
+              b60Plus += inv.outstandingAmount;
+            }
+          }
+        });
+
+        this.totalRevenue.set(rev);
+        this.totalCollected.set(col);
+        this.totalOutstanding.set(out);
+        this.overdueCount.set(overdue);
+
+        this.agingCurrent.set(bCurrent);
+        this.aging1To30.set(b130);
+        this.aging31To60.set(b3160);
+        this.aging60Plus.set(b60Plus);
+
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      }
+    });
+  }
+
+  // Max value for aging chart scale
+  maxAgingValue = computed(() => {
+    const max = Math.max(
+      this.agingCurrent(),
+      this.aging1To30(),
+      this.aging31To60(),
+      this.aging60Plus(),
+      1
+    );
+    return max;
   });
-}
 
-  // loadCustomers(): void{
-  //   this.loading.set(true)
-  //   this.errorMessage.set('')
+  getAgingHeightPercent(val: number): number {
+    const percent = (val / this.maxAgingValue()) * 100;
+    return Math.max(6, Math.min(100, Math.round(percent)));
+  }
 
-  //   this.customerService.getCustomers().subscribe({
-  //     next: (res) => {
-  //       this.customers.set(res)
-  //       this.loading.set(false)
-  //     },
-  //     error: (err) => {
-  //       this.errorMessage.set(err?.error?.message ?? 'Failed to load customers');
-  //       this.loading.set(false);
-  //     }
-  //   })
-  // }
-
-  // currentPage = signal(1);
-  pageSize = signal(10);
-  totalCount = signal(0);
-  // totalPages = signal(0);
-
-  usersPage = signal(1);
-  usersTotalPages = signal(0);
-
-  customersPage = signal(1);
-  customersTotalPages = signal(0);
-
-  loadUsers(page: number = 1): void {
-  this.loading.set(true);
-  this.errorMessage.set('');
-
-  this.authService.getLoginUser(
-    page,
-    this.pageSize()
-  ).subscribe({
-    next: (data) => {
-      this.users.set(data.items);
-      this.totalUsers.set(data.totalCount);
-
-      this.usersPage.set(data.pageNumber);
-      this.totalCount.set(data.totalCount);
-      this.customersTotalPages.set(data.totalPages);
-      this.loading.set(false);
-    },
-    error: () => {
-      this.errorMessage.set('Failed to load users');
-      this.loading.set(false);
-    }
+  collectionRate = computed(() => {
+    if (this.totalRevenue() === 0) return 0;
+    return Math.round((this.totalCollected() / this.totalRevenue()) * 100);
   });
-}
-
-previousPage(): void {
-  if (this.usersPage() > 1) {
-    this.loadUsers(this.usersPage() - 1);
-  }
-}
-
-nextPage(): void {
-  if (this.usersPage() < this.customersTotalPages()) {
-    this.loadUsers(this.usersPage() + 1);
-  }
-}
-
-// previousPage(): void {
-//   if (this.currentPage() > 1) {
-//     this.loadCustomers(this.currentPage() - 1);
-//   }
-// }
-
-// nextPage(): void {
-//   if (this.currentPage() < this.totalPages()) {
-//     this.loadCustomers(this.currentPage() + 1);
-//   }
-// }
-
-
-  // loadUser(): void {
-  //   this.loading.set(true)
-  //   this.errorMessage.set('')
-
-  //   this.authService.getLoginUser().subscribe({
-  //     next: (res) => {
-  //       this.users.set(res)
-  //       this.loading.set(false)
-  //     },
-  //     error: (err) => {
-  //       this.errorMessage.set(err?.error?.message ?? 'Failed to load Users');
-  //       this.loading.set(false);
-  //     }
-  //   })
-  // }
-
-  totalUsers = signal(0)
-  totalCustomers = signal(0)
-
-   stats = computed(() => [
-    {
-      title: 'Total Users',
-      // value: '1,248',
-      value: this.totalUsers().toLocaleString(),
-      change: '+12.5%',
-      type: 'users'
-    },
-    {
-      title: 'Total Customers',
-      // value: '$84,520',
-      value: this.totalCustomers().toLocaleString(),
-      change: '+8.2%',
-      type: 'sales'
-    },
-    {
-      title: 'Total Invoices',
-      value: '3,642',
-      change: '+15.3%',
-      type: 'orders'
-    },
-    {
-      title: 'Revenue',
-      value: '$124,680',
-      change: '+10.8%',
-      type: 'revenue'
-    }
-  ]);
-
 }

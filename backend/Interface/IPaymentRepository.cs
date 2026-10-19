@@ -1,10 +1,12 @@
-﻿using backend.Model.Database;
+﻿using backend.DTOs.Pagination;
+using backend.Helper;
+using backend.Model.Database;
 
 namespace backend.Interface;
 
 public interface IPaymentRepository
 {
-    Task<List<Payment>> GetAllAsync();
+    Task<PagedResult<Payment>> GetAllAsync(PaginationRequest request);
 
     Task<Payment?> GetByIdAsync(int id);
 
@@ -14,8 +16,7 @@ public interface IPaymentRepository
 
     Task AddAsync(Payment payment);
 
-    Task AddAllocationsAsync(
-        IEnumerable<PaymentAllocation> allocations);
+    Task AddAllocationsAsync(IEnumerable<PaymentAllocation> allocations);
 
     Task SaveChangesAsync();
 }

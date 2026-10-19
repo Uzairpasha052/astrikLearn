@@ -1,0 +1,416 @@
+<div class="intelligence-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="badge-tag">✦ ADVISORY AI / ML ENGINE</div>
+      <h1>Late-Payment Risk Scoring</h1>
+      <p>Local statistical scoring algorithm analyzing invoice aging, customer historical settlement rates, and exposure risk.</p>
+    </div>
+
+    <div class="tabs-control">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab() === 'scoring'"
+        (click)="activeTab.set('scoring')"
+      >
+        Risk Portfolio Queue
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab() === 'audit'"
+        (click)="activeTab.set('audit')"
+      >
+        Audit Trail ({{ auditRecords().length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card critical">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-content">
+        <span>Critical Risk (>75 pts)</span>
+        <h2>{{ criticalCount() }}</h2>
+        <small>Immediate follow-up mandated</small>
+      </div>
+    </div>
+
+    <div class="kpi-card high">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-content">
+        <span>High Risk (50-74 pts)</span>
+        <h2>{{ highCount() }}</h2>
+        <small>High delay probability</small>
+      </div>
+    </div>
+
+    <div class="kpi-card medium">
+      <div class="kpi-icon">⏱</div>
+      <div class="kpi-content">
+        <span>Medium Risk (28-49 pts)</span>
+        <h2>{{ mediumCount() }}</h2>
+        <small>Routine courtesy reminder</small>
+      </div>
+    </div>
+
+    <div class="kpi-card low">
+      <div class="kpi-icon">✓</div>
+      <div class="kpi-content">
+        <span>Low Risk (<28 pts)</span>
+        <h2>{{ lowCount() }}</h2>
+        <small>Strong customer credit history</small>
+      </div>
+    </div>
+  </div>
+
+  @if (activeTab() === 'scoring') {
+    <!-- FILTERS -->
+    <div class="filters-card">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Filter by customer name or invoice number..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-item">
+          <label>Filter Risk Tier:</label>
+          <select [ngModel]="filterRisk()" (ngModelChange)="filterRisk.set($event)">
+            <option value="ALL">All Risk Tiers</option>
+            <option value="Critical">Critical Risk</option>
+            <option value="High">High Risk</option>
+            <option value="Medium">Medium Risk</option>
+            <option value="Low">Low Risk</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- RISK QUEUE TABLE -->
+    <div class="table-card">
+      <div class="table-header-info">
+        <h3>Prioritized Collection Queue</h3>
+        <span class="count-tag">{{ filteredEvaluations().length }} Invoices Evaluated</span>
+      </div>
+
+      <div class="table-responsive">
+        @if (loading()) {
+          <div class="loader-state">
+            <div class="spinner"></div>
+            <p>Running statistical scoring models across ledger...</p>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 110px;">Risk Score</th>
+                <th>Classification</th>
+                <th>Invoice #</th>
+                <th>Customer Profile</th>
+                <th>Due Date & Aging</th>
+                <th class="text-right">Outstanding</th>
+                <th>Confidence</th>
+                <th>Primary Explainable Driver</th>
+                <th class="text-right">Advisory Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of filteredEvaluations(); track e.invoiceId) {
+                <tr [class.highlight-row]="e.riskLevel === 'Critical'">
+                  <td>
+                    <div class="score-pill" [class]="e.riskLevel.toLowerCase()">
+                      <span class="score-val">{{ e.score }}</span>
+                      <span class="score-max">/100</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="risk-badge" [class]="e.riskLevel.toLowerCase()">
+                      {{ e.riskLevel }}
+                    </span>
+                  </td>
+                  <td class="font-bold text-primary">{{ e.invoiceNumber }}</td>
+                  <td>
+                    <div class="customer-cell">
+                      <span class="avatar-small">{{ e.customerName.charAt(0) || 'C' }}</span>
+                      <strong>{{ e.customerName }}</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <div>{{ e.dueDate }}</div>
+                    @if (e.daysOverdue > 0) {
+                      <small class="text-danger font-medium">{{ e.daysOverdue }} days overdue</small>
+                    } @else {
+                      <small class="text-success">Current</small>
+                    }
+                  </td>
+                  <td class="text-right font-bold" [class.text-danger]="e.outstandingAmount > 0">
+                    ${{ e.outstandingAmount | number: '1.2-2' }}
+                  </td>
+                  <td>
+                    <span class="confidence-badge">{{ e.confidence }}%</span>
+                  </td>
+                  <td class="explain-cell">
+                    {{ e.explanation[0] || 'Standard baseline evaluation' }}
+                  </td>
+                  <td class="text-right">
+                    <div class="action-buttons">
+                      <button class="btn-sm btn-outline" (click)="openDetail(e)" title="View Detailed Breakdown">
+                        Analysis
+                      </button>
+                      <button class="btn-sm btn-outline" (click)="openOverrideModal(e)" title="Override / Log Confirmation">
+                        Audit
+                      </button>
+                      <button class="btn-sm btn-action" (click)="openQuickReminder(e)" title="Schedule Reminder">
+                        Follow-up
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="9" class="empty-state">
+                    <p>No invoices matched your filter criteria.</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  } @else {
+    <!-- AUDIT TRAIL LOG TAB -->
+    <div class="table-card">
+      <div class="table-header-info">
+        <div>
+          <h3>AI Decision Audit Trail</h3>
+          <p class="modal-sub">Historical log of advisory outputs, user confirmations, overrides, and actions taken.</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        @if (auditRecords().length === 0) {
+          <div class="empty-state">
+            <div class="empty-box">
+              <span class="empty-icon">🛡</span>
+              <h4>No audit logs recorded yet</h4>
+              <p>When users confirm or override AI advisory recommendations, the decisions are logged here for compliance.</p>
+            </div>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Audit ID</th>
+                <th>Timestamp</th>
+                <th>Invoice #</th>
+                <th>Customer</th>
+                <th>Original Risk</th>
+                <th>Final User Level</th>
+                <th>Confirmed By</th>
+                <th>User Audit Memo</th>
+                <th>Action Taken</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of auditRecords(); track a.id) {
+                <tr>
+                  <td class="font-mono text-muted text-sm">{{ a.id }}</td>
+                  <td class="text-sm">{{ a.timestamp | date: 'dd MMM yyyy, HH:mm' }}</td>
+                  <td class="font-bold text-primary">{{ a.invoiceNumber }}</td>
+                  <td>{{ a.customerName }}</td>
+                  <td>
+                    <span class="risk-badge" [class]="a.originalRiskLevel.toLowerCase()">
+                      {{ a.originalRiskLevel }} ({{ a.originalScore }})
+                    </span>
+                  </td>
+                  <td>
+                    <span class="risk-badge" [class]="a.overrideRiskLevel.toLowerCase()">
+                      {{ a.overrideRiskLevel }}
+                    </span>
+                  </td>
+                  <td><strong>{{ a.confirmedBy }}</strong></td>
+                  <td class="text-sm text-muted">{{ a.userNotes }}</td>
+                  <td><span class="action-tag">{{ a.actionTaken }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: DETAILED EXPLAINABILITY BREAKDOWN -->
+  @if (selectedEval() && !showOverrideModal() && !showReminderModal()) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="modal-window modal-md" (click)="$event.stopPropagation()">
+        <div class="modal-header ai-header">
+          <div>
+            <div class="ai-badge">✦ EXPLAINABLE INTELLIGENCE REPORT</div>
+            <h2>Risk Breakdown: {{ selectedEval()!.invoiceNumber }}</h2>
+            <p>{{ selectedEval()!.customerName }} &bull; Outstanding: ${{ selectedEval()!.outstandingAmount | number: '1.2-2' }}</p>
+          </div>
+          <button class="btn-close" (click)="closeDetail()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="score-hero">
+            <div class="hero-score" [class]="selectedEval()!.riskLevel.toLowerCase()">
+              <h1>{{ selectedEval()!.score }}</h1>
+              <span>OUT OF 100</span>
+            </div>
+            <div class="hero-info">
+              <span class="risk-badge lg" [class]="selectedEval()!.riskLevel.toLowerCase()">
+                {{ selectedEval()!.riskLevel }} Risk Tier
+              </span>
+              <p>Model Confidence: <strong>{{ selectedEval()!.confidence }}%</strong></p>
+              <p>Evaluated on: {{ selectedEval()!.evaluatedAt | date: 'medium' }}</p>
+            </div>
+          </div>
+
+          <div class="section-title">
+            <h4>Factor Attribution & Weights</h4>
+          </div>
+
+          <div class="factors-detailed">
+            @for (f of selectedEval()!.factors; track f.factor) {
+              <div class="factor-row" [class]="f.impact">
+                <div class="factor-header">
+                  <strong>{{ f.factor }}</strong>
+                  <span class="factor-weight">{{ f.weight > 0 ? '+' : '' }}{{ f.weight }} pts</span>
+                </div>
+                <p>{{ f.detail }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="advisory-box">
+            <span class="advisory-title">Recommended Follow-up Protocol:</span>
+            <p>{{ selectedEval()!.recommendedAction }}</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeDetail()">Close</button>
+          <button class="btn btn-outline" (click)="openOverrideModal(selectedEval()!)">
+            Override / Confirm Assessment
+          </button>
+          <button class="btn btn-primary" (click)="openQuickReminder(selectedEval()!)">
+            Schedule Follow-up Action
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: USER OVERRIDE & COMPLIANCE CONFIRMATION -->
+  @if (showOverrideModal() && selectedEval()) {
+    <div class="modal-backdrop" (click)="closeOverrideModal()">
+      <div class="modal-window modal-md" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>Confirm or Override AI Risk Level</h2>
+            <p class="modal-sub">Compliance requirement: Advisory AI requires human confirmation.</p>
+          </div>
+          <button class="btn-close" (click)="closeOverrideModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Current AI Recommended Level:</label>
+            <div class="risk-badge" [class]="selectedEval()!.riskLevel.toLowerCase()">
+              {{ selectedEval()!.riskLevel }} (Score: {{ selectedEval()!.score }}/100)
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Final Confirmed / Overridden Risk Level:</label>
+            <select [ngModel]="overrideRiskLevel()" (ngModelChange)="overrideRiskLevel.set($event)" class="form-control">
+              <option value="Low">Low Risk</option>
+              <option value="Medium">Medium Risk</option>
+              <option value="High">High Risk</option>
+              <option value="Critical">Critical Risk</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>User Audit Memo / Justification:</label>
+            <textarea
+              [ngModel]="overrideNotes()"
+              (ngModelChange)="overrideNotes.set($event)"
+              rows="3"
+              placeholder="e.g. Spoke with client CFO, payment committed for Friday / Special agreement in place..."
+              class="form-control"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeOverrideModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="submitOverride()">
+            Save Audit Record
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: QUICK REMINDER DISPATCH -->
+  @if (showReminderModal() && selectedEval()) {
+    <div class="modal-backdrop" (click)="closeQuickReminder()">
+      <div class="modal-window modal-md" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>Schedule Follow-up from AI Advisory</h2>
+            <p class="modal-sub">Customer: {{ selectedEval()!.customerName }} &bull; Invoice: {{ selectedEval()!.invoiceNumber }}</p>
+          </div>
+          <button class="btn-close" (click)="closeQuickReminder()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Follow-up Date:</label>
+              <input type="date" [ngModel]="reminderDate()" (ngModelChange)="reminderDate.set($event)" class="form-control" />
+            </div>
+
+            <div class="form-group flex-1">
+              <label>Communication Channel:</label>
+              <select [ngModel]="reminderType()" (ngModelChange)="reminderType.set($event)" class="form-control">
+                <option value="Email">Email</option>
+                <option value="Phone Call">Phone Call</option>
+                <option value="SMS">SMS</option>
+                <option value="Formal Notice">Formal Demand Notice</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Draft Message / Instructions:</label>
+            <textarea
+              [ngModel]="reminderMessage()"
+              (ngModelChange)="reminderMessage.set($event)"
+              rows="4"
+              class="form-control"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeQuickReminder()">Cancel</button>
+          <button class="btn btn-primary" [disabled]="schedulingReminder()" (click)="sendReminder()">
+            {{ schedulingReminder() ? 'Scheduling...' : 'Confirm & Schedule' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

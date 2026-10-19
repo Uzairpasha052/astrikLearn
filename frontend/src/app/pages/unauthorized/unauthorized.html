@@ -1,13 +1,12 @@
-<div class="unauthorized">
-  <h1>403</h1>
-
-  <h2>Access Denied</h2>
-
-  <p>
-    You don't have permission to access this page.
-  </p>
-
-  <button routerLink="/login">
-    Go to Login
-  </button>
+<div class="unauthorized-page">
+  <div class="unauthorized-card">
+    <div class="status-badge">403 RESTRICTED</div>
+    <h1>Access Restricted</h1>
+    <h2>Role Permission Required</h2>
+    <p>Your current security role does not have authorization to view this resource. Contact your system administrator to adjust role access.</p>
+    <div class="actions">
+      <a routerLink="/login" class="btn btn-primary">Return to Sign In</a>
+      <a routerLink="/invoices" class="btn btn-secondary">Invoices Portal</a>
+    </div>
+  </div>
 </div>

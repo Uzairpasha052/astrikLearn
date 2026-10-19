@@ -1,127 +1,191 @@
-<div class="dashboard">
+<div class="accountant-dashboard">
 
+  <!-- HEADER -->
   <div class="dashboard-header">
     <div>
-      <h1>Accountant Dashboard</h1>
-      <p>Financial overview for today</p>
+      <div class="badge-tag">FINANCIAL LEDGER & CONTROLLER</div>
+      <h1>Accountant Operations Dashboard</h1>
+      <p>Billing control, cash allocation, aging monitoring, and credit follow-ups.</p>
     </div>
 
-    <button class="action-btn">
-      + Create Invoice
-    </button>
+    <div class="header-actions">
+      <a routerLink="/invoices" class="btn btn-primary">+ Create Invoice</a>
+      <a routerLink="/payments" class="btn btn-secondary">+ Record Payment</a>
+      <a routerLink="/reminders" class="btn btn-outline">🔔 Reminders</a>
+    </div>
   </div>
 
+  <!-- STATS GRID -->
   <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon revenue">💵</div>
+      <div>
+        <span class="stat-label">Total Invoiced</span>
+        <h2>${{ totalInvoiced() | number: '1.2-2' }}</h2>
+        <small class="stat-sub">Gross Billed Portfolio</small>
+      </div>
+    </div>
 
-    @for (stat of stats; track stat.title) {
+    <div class="stat-card">
+      <div class="stat-icon collections">✓</div>
+      <div>
+        <span class="stat-label">Collected Collections</span>
+        <h2 class="text-success">${{ totalCollected() | number: '1.2-2' }}</h2>
+        <small class="stat-sub text-success">{{ recoveryRate() }}% Settled</small>
+      </div>
+    </div>
 
-      <div class="stat-card">
+    <div class="stat-card">
+      <div class="stat-icon receivables">⚠️</div>
+      <div>
+        <span class="stat-label">Unpaid Receivables</span>
+        <h2 class="text-danger">${{ totalOutstanding() | number: '1.2-2' }}</h2>
+        <small class="stat-sub text-danger">{{ overdueInvoices() }} Overdue</small>
+      </div>
+    </div>
 
-        <div class="icon">
-          $
-        </div>
+    <div class="stat-card">
+      <div class="stat-icon treasury">🏦</div>
+      <div>
+        <span class="stat-label">Unallocated Cash</span>
+        <h2 class="text-warning">${{ unallocatedCash() | number: '1.2-2' }}</h2>
+        <small class="stat-sub">Pending Allocation to Invoices</small>
+      </div>
+    </div>
+  </div>
 
-        <div>
-          <span>{{ stat.title }}</span>
-          <h2>{{ stat.value }}</h2>
-          <small>{{ stat.change }}</small>
-        </div>
+  <!-- AGING BUCKETS STRIP -->
+  <div class="card aging-strip-card">
+    <div class="card-header">
+      <div>
+        <h3>Receivables Aging Analysis</h3>
+        <p>Outstanding balances categorized by payment age bracket</p>
+      </div>
+      <a routerLink="/invoices" class="view-link">View Full Ledger →</a>
+    </div>
 
+    <div class="aging-strip">
+      <div class="aging-box current">
+        <span class="box-title">Current (Not Overdue)</span>
+        <strong>${{ agingCurrent() | number: '1.2-2' }}</strong>
+        <small>Due within credit window</small>
       </div>
 
-    }
+      <div class="aging-box warning">
+        <span class="box-title">1 - 30 Days Overdue</span>
+        <strong>${{ aging1To30() | number: '1.2-2' }}</strong>
+        <small>Courtesy reminder due</small>
+      </div>
 
+      <div class="aging-box danger">
+        <span class="box-title">31 - 60 Days Overdue</span>
+        <strong>${{ aging31To60() | number: '1.2-2' }}</strong>
+        <small>Escalate credit follow-up</small>
+      </div>
+
+      <div class="aging-box critical">
+        <span class="box-title">60+ Days Overdue</span>
+        <strong>${{ aging60Plus() | number: '1.2-2' }}</strong>
+        <small>Critical default risk</small>
+      </div>
+    </div>
   </div>
 
+  <!-- TABLES GRID -->
   <div class="content-grid">
 
+    <!-- RECENT INVOICES -->
     <div class="card">
-
       <div class="card-header">
         <div>
-          <h2>Recent Invoices</h2>
-          <p>Latest invoices and payment status</p>
+          <h3>Recent Invoices</h3>
+          <p>Latest billings awaiting settlement</p>
         </div>
-
-        <button class="view-btn">
-          View All
-        </button>
+        <a routerLink="/invoices" class="view-link">Manage Invoices →</a>
       </div>
 
-      <div class="table-container">
+      <div class="table-responsive">
+        @if (loading()) {
+          <p class="p-4 text-muted">Loading transactions...</p>
+        } @else {
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Customer</th>
+                <th class="text-right">Total</th>
+                <th class="text-right">Due Balance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (inv of invoices(); track inv.id) {
+                <tr>
+                  <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
+                  <td>{{ inv.customerName }}</td>
+                  <td class="text-right">${{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td class="text-right font-medium" [class.text-danger]="inv.outstandingAmount > 0">
+                    ${{ inv.outstandingAmount | number: '1.2-2' }}
+                  </td>
+                  <td>
+                    <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
+                      {{ inv.status }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="text-center p-4 text-muted">No invoices recorded</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
 
-        <table>
+    <!-- RECENT PAYMENTS -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3>Recent Cash Receipts</h3>
+          <p>Latest payment deposits</p>
+        </div>
+        <a routerLink="/payments" class="view-link">Manage Payments →</a>
+      </div>
 
+      <div class="table-responsive">
+        <table class="dashboard-table">
           <thead>
             <tr>
-              <th>Invoice</th>
+              <th>Date</th>
               <th>Customer</th>
-              <th>Amount</th>
+              <th class="text-right">Amount</th>
               <th>Status</th>
             </tr>
           </thead>
-
           <tbody>
-
-            @for (invoice of invoices; track invoice.invoice) {
-
+            @for (p of payments(); track p.id) {
               <tr>
-                <td>{{ invoice.invoice }}</td>
-                <td>{{ invoice.customer }}</td>
-                <td>{{ invoice.amount }}</td>
-
+                <td class="text-muted">{{ p.paymentDate }}</td>
+                <td><strong>{{ p.customerName }}</strong></td>
+                <td class="text-right text-success font-bold">${{ p.amount | number: '1.2-2' }}</td>
                 <td>
-                  <span
-                    class="status"
-                    [class.paid]="invoice.status === 'Paid'"
-                    [class.pending]="invoice.status === 'Pending'"
-                    [class.overdue]="invoice.status === 'Overdue'"
-                  >
-                    {{ invoice.status }}
-                  </span>
+                  @if (p.unallocatedAmount > 0) {
+                    <span class="badge-pending">Unallocated</span>
+                  } @else {
+                    <span class="badge-allocated">Allocated</span>
+                  }
                 </td>
-
               </tr>
-
+            } @empty {
+              <tr>
+                <td colspan="4" class="text-center p-4 text-muted">No payments recorded</td>
+              </tr>
             }
-
           </tbody>
-
         </table>
-
       </div>
-
-    </div>
-
-    <div class="card">
-
-      <h2>Financial Summary</h2>
-      <p class="subtitle">This month's performance</p>
-
-      <div class="summary">
-
-        <div class="summary-item">
-          <span>Revenue</span>
-          <strong>$124,680</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Expenses</span>
-          <strong>$42,350</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Profit</span>
-          <strong class="profit">$82,330</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Tax</span>
-          <strong>$12,420</strong>
-        </div>
-
-      </div>
-
     </div>
 
   </div>

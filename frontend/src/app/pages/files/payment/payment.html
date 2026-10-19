@@ -1,0 +1,336 @@
+<div class="payment-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="badge-tag">TREASURY & CASH COLLECTION</div>
+      <h1>Payments & Allocations</h1>
+      <p>Record customer settlements, track unallocated cash, and distribute funds across invoices.</p>
+    </div>
+
+    <div class="header-actions">
+      @if (canRecord) {
+        <button class="btn btn-primary" (click)="openRecordModal()">
+          <span class="btn-icon">+</span> Record Payment
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- FILTERS & CONTROLS -->
+  <div class="filters-card">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search customer, reference number, or method..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      />
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-item">
+        <label>Allocation Status:</label>
+        <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)">
+          <option value="ALL">All Payments</option>
+          <option value="UNALLOCATED">Has Unallocated Cash</option>
+          <option value="FULLY_ALLOCATED">Fully Allocated</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENTS TABLE CARD -->
+  <div class="table-card">
+    <div class="table-header-info">
+      <h3>Payment Transactions</h3>
+      <span class="count-tag">{{ filteredPayments().length }} Records</span>
+    </div>
+
+    <div class="table-responsive">
+      @if (loading()) {
+        <div class="loader-state">
+          <div class="spinner"></div>
+          <p>Loading payments ledger...</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Reference #</th>
+              <th>Method</th>
+              <th class="text-right">Total Amount</th>
+              <th class="text-right">Allocated</th>
+              <th class="text-right">Unallocated</th>
+              <th>Notes</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of filteredPayments(); track p.id) {
+              <tr>
+                <td class="font-medium">{{ p.paymentDate }}</td>
+                <td>
+                  <div class="customer-cell">
+                    <span class="avatar-small">{{ p.customerName.charAt(0) || 'C' }}</span>
+                    <strong>{{ p.customerName }}</strong>
+                  </div>
+                </td>
+                <td class="font-mono text-muted">{{ p.referenceNumber || 'N/A' }}</td>
+                <td>
+                  <span class="method-tag">{{ p.paymentMethod || 'Direct' }}</span>
+                </td>
+                <td class="text-right font-bold text-success">
+                  ${{ p.amount | number: '1.2-2' }}
+                </td>
+                <td class="text-right text-muted">
+                  ${{ p.amountAllocated | number: '1.2-2' }}
+                </td>
+                <td class="text-right">
+                  @if (p.unallocatedAmount > 0) {
+                    <span class="unallocated-badge">
+                      ${{ p.unallocatedAmount | number: '1.2-2' }} Pending
+                    </span>
+                  } @else {
+                    <span class="settled-tag">Settled</span>
+                  }
+                </td>
+                <td class="text-muted text-sm notes-cell">
+                  {{ p.notes || '-' }}
+                </td>
+                <td class="text-right">
+                  @if (canRecord && p.unallocatedAmount > 0) {
+                    <button class="btn btn-sm btn-allocate" (click)="openAllocateModal(p)">
+                      ✦ Allocate Funds
+                    </button>
+                  } @else {
+                    <span class="text-muted text-sm">Completed</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="empty-state">
+                  <div class="empty-box">
+                    <span class="empty-icon">💳</span>
+                    <h4>No payments recorded yet</h4>
+                    <p>Record your first customer payment and distribute it to open invoices.</p>
+                    @if (canRecord) {
+                      <button class="btn btn-primary" (click)="openRecordModal()">Record First Payment</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-footer">
+      <span class="text-muted">
+        Showing Page {{ currentPage() }} of {{ totalPages() || 1 }} ({{ totalCount() }} total)
+      </span>
+
+      <div class="pagination-btns">
+        <button
+          class="btn-page"
+          [disabled]="currentPage() <= 1 || loading()"
+          (click)="goToPage(currentPage() - 1)"
+        >
+          Previous
+        </button>
+        <button class="btn-page active">{{ currentPage() }}</button>
+        <button
+          class="btn-page"
+          [disabled]="currentPage() >= totalPages() || loading()"
+          (click)="goToPage(currentPage() + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RECORD PAYMENT -->
+  @if (showRecordModal()) {
+    <div class="modal-backdrop" (click)="closeRecordModal()">
+      <div class="modal-window modal-md" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2>Record Customer Payment</h2>
+            <p class="modal-sub">Log received cash, cheque, or electronic transfer.</p>
+          </div>
+          <button class="btn-close" (click)="closeRecordModal()">✕</button>
+        </div>
+
+        <form [formGroup]="paymentForm" (ngSubmit)="submitPayment()" class="modal-body">
+          <div class="form-group">
+            <label>Customer <span class="required">*</span></label>
+            <select formControlName="customerId" class="form-control">
+              <option [ngValue]="0" disabled>-- Select Customer --</option>
+              @for (c of customers(); track c.id) {
+                <option [ngValue]="c.id">{{ c.name }}</option>
+              }
+            </select>
+            @if (paymentForm.controls.customerId.touched && paymentForm.controls.customerId.invalid) {
+              <small class="error-text">Please select a customer</small>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Payment Date <span class="required">*</span></label>
+              <input type="date" formControlName="paymentDate" class="form-control" />
+            </div>
+
+            <div class="form-group flex-1">
+              <label>Amount Received ($) <span class="required">*</span></label>
+              <input type="number" formControlName="amount" min="0.01" step="0.01" class="form-control" />
+              @if (paymentForm.controls.amount.touched && paymentForm.controls.amount.invalid) {
+                <small class="error-text">Amount must be greater than zero</small>
+              }
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Payment Method</label>
+              <select formControlName="paymentMethod" class="form-control">
+                <option value="Bank Transfer">Bank Transfer (Wire/ACH)</option>
+                <option value="Cash">Cash</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Online Gateway">Online Gateway</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label>Reference # / Transaction ID</label>
+              <input type="text" formControlName="referenceNumber" placeholder="e.g. TXN-94821" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Notes</label>
+            <textarea formControlName="notes" rows="2" placeholder="Optional audit memo or bank reference" class="form-control"></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeRecordModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="saving()">
+              {{ saving() ? 'Recording...' : 'Record Payment' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: ALLOCATE PAYMENT TO INVOICES -->
+  @if (showAllocateModal() && selectedPayment()) {
+    <div class="modal-backdrop" (click)="closeAllocateModal()">
+      <div class="modal-window modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header allocate-header">
+          <div>
+            <div class="badge-tag">LEDGER ALLOCATION</div>
+            <h2>Distribute Funds: Payment #{{ selectedPayment()!.id }}</h2>
+            <p>Customer: <strong>{{ selectedPayment()!.customerName }}</strong> &bull; Total Payment: <strong>${{ selectedPayment()!.amount | number: '1.2-2' }}</strong></p>
+          </div>
+          <button class="btn-close" (click)="closeAllocateModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Allocation balance header card -->
+          <div class="allocation-banner">
+            <div class="banner-stat">
+              <span>Available to Allocate:</span>
+              <strong class="text-primary">${{ selectedPayment()!.unallocatedAmount | number: '1.2-2' }}</strong>
+            </div>
+
+            <div class="banner-stat">
+              <span>Allocated In This Batch:</span>
+              <strong class="text-success">${{ getTotalAllocatedNow() | number: '1.2-2' }}</strong>
+            </div>
+
+            <div class="banner-stat">
+              <span>Remaining Balance:</span>
+              <strong [class.text-danger]="getRemainingUnallocatedNow() < 0">
+                ${{ getRemainingUnallocatedNow() | number: '1.2-2' }}
+              </strong>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm" (click)="autoAllocate()">
+              ⚡ Auto-Distribute (Oldest First)
+            </button>
+          </div>
+
+          @if (allocating() && customerInvoices().length === 0) {
+            <div class="loader-state">
+              <div class="spinner"></div>
+              <p>Fetching open invoices for {{ selectedPayment()!.customerName }}...</p>
+            </div>
+          } @else if (allocationRows().length === 0) {
+            <div class="empty-state">
+              <p>No open or partially paid invoices found for this customer.</p>
+            </div>
+          } @else {
+            <div class="items-table-wrapper">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Due Date</th>
+                    <th class="text-right">Total Invoice</th>
+                    <th class="text-right">Outstanding</th>
+                    <th style="width: 180px;" class="text-right">Amount To Allocate ($)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of allocationRows(); track row.invoice.id) {
+                    <tr>
+                      <td class="font-bold text-primary">{{ row.invoice.invoiceNumber }}</td>
+                      <td class="text-muted">{{ row.invoice.dueDate }}</td>
+                      <td class="text-right">${{ row.invoice.totalAmount | number: '1.2-2' }}</td>
+                      <td class="text-right font-medium text-danger">
+                        ${{ row.invoice.outstandingAmount | number: '1.2-2' }}
+                      </td>
+                      <td class="text-right">
+                        <input
+                          type="number"
+                          [(ngModel)]="row.allocatedAmount"
+                          [max]="row.invoice.outstandingAmount"
+                          min="0"
+                          step="0.01"
+                          class="form-control text-right"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeAllocateModal()">Cancel</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="allocating() || getTotalAllocatedNow() <= 0 || getRemainingUnallocatedNow() < 0"
+            (click)="submitAllocations()"
+          >
+            {{ allocating() ? 'Processing...' : 'Confirm Allocation' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

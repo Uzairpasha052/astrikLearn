@@ -1,76 +1,71 @@
-import { Component, signal } from '@angular/core';
-import { AuthService, UserDisplay } from '../../../services/auth-service';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService, UserDisplay } from '../../../services/auth-service';
 
 @Component({
-  imports: [RouterLink, DatePipe],
   selector: 'app-user',
+  standalone: true,
+  imports: [CommonModule, RouterLink, FormsModule],
   styleUrl: './user.scss',
-  templateUrl: './user.html',
+  templateUrl: './user.html'
 })
-export class User {
+export class User implements OnInit {
+  private authService = inject(AuthService);
 
   users = signal<UserDisplay[]>([]);
   loading = signal(true);
   error = signal('');
+  searchTerm = signal('');
 
   currentPage = signal(1);
   pageSize = signal(10);
   totalCount = signal(0);
   totalPages = signal(0);
 
-  constructor(private authService: AuthService) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadUsers();
   }
 
   loadUsers(page: number = 1): void {
-  this.loading.set(true);
-  this.error.set('');
+    this.loading.set(true);
+    this.error.set('');
 
-  this.authService.getLoginUser(
-    page,
-    this.pageSize()
-  ).subscribe({
-    next: (data) => {
-      this.users.set(data.items);
-      this.currentPage.set(data.pageNumber);
-      this.totalCount.set(data.totalCount);
-      this.totalPages.set(data.totalPages);
-      this.loading.set(false);
-    },
-    error: () => {
-      this.error.set('Failed to load users');
-      this.loading.set(false);
+    this.authService.getLoginUser(page, this.pageSize()).subscribe({
+      next: (data) => {
+        this.users.set(data.items);
+        this.currentPage.set(data.pageNumber);
+        this.totalCount.set(data.totalCount);
+        this.totalPages.set(data.totalPages);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Failed to load user directory');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  filteredUsers = computed(() => {
+    let list = this.users();
+    const search = this.searchTerm().trim().toLowerCase();
+
+    if (search) {
+      list = list.filter(
+        (u) =>
+          u.name.toLowerCase().includes(search) ||
+          u.email.toLowerCase().includes(search) ||
+          u.role.toLowerCase().includes(search)
+      );
     }
+
+    return list;
   });
-}
-  // loadUsers() {
-  //   this.loading.set(true);
-  //   this.authService.getLoginUser().subscribe({
-  //     next: (data) => {
-  //       this.users.set(data);
-  //       this.loading.set(false);
-  //     },
-  //     error: () => {
-  //       this.error.set('Failed to load users');
-  //       this.loading.set(false);
-  //     }
-  //   });
-  // }
 
-  previousPage(): void {
-    if (this.currentPage() > 1) {
-      this.loadUsers(this.currentPage() - 1);
+  goToPage(p: number): void {
+    if (p >= 1 && p <= this.totalPages()) {
+      this.loadUsers(p);
     }
   }
-
-  nextPage(): void {
-    if (this.currentPage() < this.totalPages()) {
-      this.loadUsers(this.currentPage() + 1);
-    }
-  }
-
 }

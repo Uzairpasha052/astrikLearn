@@ -1,143 +1,155 @@
-<div class="dashboard">
+<div class="sales-dashboard">
 
+  <!-- HEADER -->
   <div class="dashboard-header">
-
     <div>
-      <h1>Sales Dashboard</h1>
-      <p>Here's what's happening with your sales today.</p>
+      <div class="badge-tag">REVENUE & CLIENT ACQUISITION</div>
+      <h1>Sales Performance Portal</h1>
+      <p>Monitor deal value, customer pipeline, active billings, and account performance.</p>
     </div>
 
-    <button class="action-btn">
-      + New Deal
-    </button>
-
+    <div class="header-actions">
+      <a routerLink="/customers" class="btn btn-primary">+ Add Customer</a>
+      <a routerLink="/invoices" class="btn btn-secondary">+ Issue Invoice</a>
+    </div>
   </div>
 
-  <!-- Stats -->
-
+  <!-- STATS GRID -->
   <div class="stats-grid">
-
-    @for (stat of stats; track stat.title) {
-
-      <div class="stat-card">
-
-        <div class="icon">
-          ↑
-        </div>
-
-        <div>
-          <span>{{ stat.title }}</span>
-          <h2>{{ stat.value }}</h2>
-          <small>{{ stat.change }} from last month</small>
-        </div>
-
+    <div class="stat-card">
+      <div class="stat-icon sales">📈</div>
+      <div>
+        <span class="stat-label">Total Invoiced Sales</span>
+        <h2>${{ totalSalesValue() | number: '1.2-2' }}</h2>
+        <small class="stat-sub">Across {{ totalInvoicesCount() }} Deals Closed</small>
       </div>
+    </div>
 
-    }
+    <div class="stat-card">
+      <div class="stat-icon clients">👥</div>
+      <div>
+        <span class="stat-label">Active Client Accounts</span>
+        <h2>{{ activeAccounts() }}</h2>
+        <small class="stat-sub">Accounts in Portfolio</small>
+      </div>
+    </div>
 
+    <div class="stat-card">
+      <div class="stat-icon deals">🎯</div>
+      <div>
+        <span class="stat-label">Average Deal Size</span>
+        <h2 class="text-primary">${{ avgDealSize() | number: '1.0-0' }}</h2>
+        <small class="stat-sub">Average Revenue per Invoice</small>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon pending">⏳</div>
+      <div>
+        <span class="stat-label">Pending Client Collections</span>
+        <h2 class="text-warning">${{ pendingRevenue() | number: '1.2-2' }}</h2>
+        <small class="stat-sub">Awaiting Customer Settlement</small>
+      </div>
+    </div>
   </div>
 
-  <!-- Main -->
-
+  <!-- MAIN GRID -->
   <div class="content-grid">
 
+    <!-- RECENT SALES INVOICES -->
     <div class="card">
-
       <div class="card-header">
-
         <div>
-          <h2>Recent Deals</h2>
-          <p>Your latest sales opportunities</p>
+          <h3>Recent Client Invoices</h3>
+          <p>Latest deals invoiced to clients</p>
         </div>
-
-        <button class="view-btn">
-          View All
-        </button>
-
+        <a routerLink="/invoices" class="view-link">View All →</a>
       </div>
 
-      <div class="table-container">
+      <div class="table-responsive">
+        @if (loading()) {
+          <p class="p-4 text-muted">Loading client transactions...</p>
+        } @else {
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Client</th>
+                <th class="text-right">Total Deal</th>
+                <th class="text-right">Balance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (inv of invoices(); track inv.id) {
+                <tr>
+                  <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
+                  <td><strong>{{ inv.customerName }}</strong></td>
+                  <td class="text-right font-medium">${{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td class="text-right" [class.text-danger]="inv.outstandingAmount > 0">
+                    ${{ inv.outstandingAmount | number: '1.2-2' }}
+                  </td>
+                  <td>
+                    <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
+                      {{ inv.status }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="text-center p-4 text-muted">No sales invoices yet</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
 
-        <table>
+    <!-- CLIENT DIRECTORY -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3>Client Directory</h3>
+          <p>Key accounts and leads</p>
+        </div>
+        <a routerLink="/customers" class="view-link">Customer Portal →</a>
+      </div>
 
+      <div class="table-responsive">
+        <table class="dashboard-table">
           <thead>
             <tr>
-              <th>Customer</th>
-              <th>Deal</th>
-              <th>Value</th>
+              <th>Client</th>
+              <th>Phone</th>
               <th>Status</th>
             </tr>
           </thead>
-
           <tbody>
-
-            @for (deal of deals; track deal.customer) {
-
+            @for (c of customers(); track c.id) {
               <tr>
-
-                <td>{{ deal.customer }}</td>
-
-                <td>{{ deal.deal }}</td>
-
-                <td>{{ deal.value }}</td>
-
                 <td>
-
-                  <span
-                    class="status"
-                    [class.won]="deal.status === 'Won'"
-                    [class.negotiation]="deal.status === 'Negotiation'"
-                    [class.pending]="deal.status === 'Pending'"
-                  >
-                    {{ deal.status }}
-                  </span>
-
+                  <div class="customer-cell">
+                    <span class="avatar-small">{{ c.name.charAt(0) || 'C' }}</span>
+                    <div>
+                      <strong>{{ c.name }}</strong>
+                      <small class="text-muted d-block">{{ c.email || 'No email' }}</small>
+                    </div>
+                  </div>
                 </td>
-
+                <td class="text-muted text-sm">{{ c.phone || '-' }}</td>
+                <td>
+                  <span class="status-pill active">Active</span>
+                </td>
               </tr>
-
+            } @empty {
+              <tr>
+                <td colspan="3" class="text-center p-4 text-muted">No client profiles recorded</td>
+              </tr>
             }
-
           </tbody>
-
         </table>
-
       </div>
-
-    </div>
-
-    <!-- Sales Target -->
-
-    <div class="card">
-
-      <h2>Monthly Target</h2>
-
-      <p class="subtitle">
-        Sales performance
-      </p>
-
-      <div class="target">
-
-        <div class="circle">
-          <strong>78%</strong>
-        </div>
-
-        <h3>$84,520</h3>
-
-        <p>of $108,000 target</p>
-
-      </div>
-
-      <div class="progress">
-
-        <div class="progress-bar"></div>
-
-      </div>
-
-      <p class="remaining">
-        $23,480 remaining
-      </p>
-
     </div>
 
   </div>

@@ -2,25 +2,23 @@
   <div class="auth-card">
 
     <div class="brand">
-      <div class="brand-icon">✦</div>
-      <h1>Welcome back</h1>
-      <p>Sign in to continue to your account</p>
+      <div class="brand-icon">INV</div>
+      <h1>Invoisly Platform</h1>
+      <p>Invoice & Payment Tracking System</p>
     </div>
 
     <form (ngSubmit)="login()" #loginForm="ngForm">
 
       <div class="form-group">
-        <label for="email">Email address</label>
-
+        <label for="email">Work Email</label>
         <div class="input-wrapper">
           <span class="input-icon">✉</span>
-
           <input
             id="email"
             type="email"
             name="email"
             [(ngModel)]="email"
-            placeholder="you@example.com"
+            placeholder="admin@gamil.com"
             required
             email
           />
@@ -30,18 +28,16 @@
       <div class="form-group">
         <div class="label-row">
           <label for="password">Password</label>
-          <!-- <a href="#" (click)="$event.preventDefault()">Forgot password?</a> -->
         </div>
 
         <div class="input-wrapper">
           <span class="input-icon">🔒</span>
-
           <input
             id="password"
             [type]="showPassword ? 'text' : 'password'"
             name="password"
             [(ngModel)]="password"
-            placeholder="Enter your password"
+            placeholder="Enter password"
             required
           />
 
@@ -55,40 +51,24 @@
         </div>
       </div>
 
-      <!-- <div class="remember-row">
-        <label class="checkbox-label">
-          <input
-            type="checkbox"
-            name="rememberMe"
-            [(ngModel)]="rememberMe"
-          />
-          <span>Remember me</span>
-        </label>
-      </div> -->
-
       <button
         class="submit-btn"
         type="submit"
-        [disabled]="loginForm.invalid"
+        [disabled]="loginForm.invalid || loading()"
       >
-        Sign in
+        {{ loading() ? 'Authenticating...' : 'Sign In to Portal' }}
       </button>
 
     </form>
 
-    <div class="divider">
-      <span>OR</span>
+    <div class="quick-credentials">
+      <span class="cred-title">System Role Credentials:</span>
+      <div class="cred-badges">
+        <button type="button" class="cred-btn" (click)="fillDemo('admin')" title="Fill Admin Credentials">
+          Admin: admin@gamil.com
+        </button>
+      </div>
     </div>
-
-    <!-- <button class="social-btn" type="button" (click)="socialLogin('Google')">
-      <span class="google-icon">G</span>
-      Continue with Google
-    </button> -->
-
-    <p class="bottom-text">
-      Don't have an account?
-      <a routerLink="/register">Create an account</a>
-    </p>
 
   </div>
 </div>

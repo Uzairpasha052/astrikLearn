@@ -69,10 +69,15 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
+builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<ReminderService>();
+
 
 //JWT
 var jwtkey = builder.Configuration["Jwt:Key"];
@@ -104,16 +109,16 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider
-        .GetRequiredService<AppDbContext>();
+// using (var scope = app.Services.CreateScope())
+// {
+//     var context = scope.ServiceProvider
+//         .GetRequiredService<AppDbContext>();
 
-    await DbSeeder.SeedAsync(
-        context,
-        scope.ServiceProvider
-            .GetRequiredService<IConfiguration>());
-}
+//     await DbSeeder.SeedAsync(
+//         context,
+//         scope.ServiceProvider
+//             .GetRequiredService<IConfiguration>());
+// }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

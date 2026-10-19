@@ -1,67 +1,113 @@
+<div class="user-page">
 
-<div class="dashboard">
-
-  <div class="dashboard-header">
+  <!-- PAGE HEADER -->
+  <div class="page-header">
     <div>
-      <h1>User Portal</h1>
-      <p>Welcome back 👋</p>
+      <div class="badge-tag">ACCESS CONTROL & RBAC</div>
+      <h1>System Users & Roles</h1>
+      <p>Manage authenticated staff credentials, security roles, and system privileges.</p>
     </div>
 
-    <!-- <button class="action-btn"> -->
-        <a routerLink="/admin/register" class="action-btn">+ Add User</a>
-    <!-- </button> -->
+    <div class="header-actions">
+      <a routerLink="/admin/register" class="btn btn-primary">
+        + Register User
+      </a>
+    </div>
   </div>
 
- 
+  <!-- FILTERS -->
+  <div class="filters-card">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search users by name, email, or role..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      />
+    </div>
+  </div>
 
-  <!-- Main Content -->
+  <!-- USERS TABLE CARD -->
+  <div class="table-card">
+    <div class="table-header-info">
+      <h3>Registered User Directory</h3>
+      <span class="count-tag">{{ filteredUsers().length }} Accounts</span>
+    </div>
 
-  <div class="content-grid">
-
-    <div class="card">
-
-      <div class="card-header">
-        <div>
-          <h2>Recent Users</h2>
-          <p>Recently registered users</p>
+    <div class="table-responsive">
+      @if (loading()) {
+        <div class="loader-state">
+          <div class="spinner"></div>
+          <p>Retrieving user profiles...</p>
         </div>
-
-        <!-- <button class="view-btn">View All</button> -->
-      </div>
-
-      <div class="table-container">
-
-        @if (loading()) {
-        <p>Loading...</p>
-        } @else if (error()) {
-        <p class="error">{{ error() }}</p>
-        } @else {
-        <table class="grid">
-            <thead>
+      } @else if (error()) {
+        <div class="empty-state">
+          <p class="text-danger">{{ error() }}</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Created</th>
+              <th>ID</th>
+              <th>User Name</th>
+              <th>Email Address</th>
+              <th>Security Role</th>
+              <th>Registered Date</th>
             </tr>
-            </thead>
-            <tbody>
-            @for (u of users(); track u.id) {
-                <tr>
-                <td>{{ u.id }}</td>
-                <td>{{ u.name }}</td>
-                <td>{{ u.email }}</td>
-                <td>{{ u.role }}</td>
-                <td>{{ u.date | date: 'dd MMM yyyy'}}</td>
-                </tr>
+          </thead>
+          <tbody>
+            @for (u of filteredUsers(); track u.id) {
+              <tr>
+                <td class="font-mono text-muted">#{{ u.id }}</td>
+                <td>
+                  <div class="customer-cell">
+                    <span class="avatar-small">{{ u.name.charAt(0) || 'U' }}</span>
+                    <strong>{{ u.name }}</strong>
+                  </div>
+                </td>
+                <td class="text-muted">{{ u.email }}</td>
+                <td>
+                  <span class="role-badge" [class]="u.role.toLowerCase()">
+                    {{ u.role }}
+                  </span>
+                </td>
+                <td class="text-muted">{{ u.date | date: 'dd MMM yyyy' }}</td>
+              </tr>
             } @empty {
-                <tr><td colspan="4">No users found</td></tr>
+              <tr>
+                <td colspan="5" class="empty-state">
+                  <p>No user accounts found matching your search.</p>
+                </td>
+              </tr>
             }
-            </tbody>
+          </tbody>
         </table>
-        }
-        
+      }
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-footer">
+      <span class="text-muted">
+        Showing Page {{ currentPage() }} of {{ totalPages() || 1 }} ({{ totalCount() }} total)
+      </span>
+
+      <div class="pagination-btns">
+        <button
+          class="btn-page"
+          [disabled]="currentPage() <= 1 || loading()"
+          (click)="goToPage(currentPage() - 1)"
+        >
+          Previous
+        </button>
+        <button class="btn-page active">{{ currentPage() }}</button>
+        <button
+          class="btn-page"
+          [disabled]="currentPage() >= totalPages() || loading()"
+          (click)="goToPage(currentPage() + 1)"
+        >
+          Next
+        </button>
       </div>
     </div>
   </div>

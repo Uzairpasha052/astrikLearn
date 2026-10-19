@@ -1,4 +1,3 @@
-// Adjust these fields to match your backend CreateCustomerDto / UpdateCustomerDto
 export interface CustomerDto {
   id: number;
   name: string;
@@ -6,7 +5,8 @@ export interface CustomerDto {
   phone?: string;
   address?: string;
   isActive: boolean;
-  date: string;
+  created?: string;
+  date?: string;
 }
 
 export interface CreateCustomerDto {

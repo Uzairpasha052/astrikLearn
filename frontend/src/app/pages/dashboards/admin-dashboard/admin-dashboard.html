@@ -1,184 +1,268 @@
-<div class="dashboard">
+<div class="dashboard-page">
 
+  <!-- DASHBOARD HEADER -->
   <div class="dashboard-header">
     <div>
-      <h1>Admin Dashboard</h1>
-      <p>Welcome back, Admin 👋</p>
+      <div class="badge-tag">EXECUTIVE OVERVIEW</div>
+      <h1>Enterprise Financial Dashboard</h1>
+      <p>Real-time tracking of receivables, collections, aging buckets, and customer accounts.</p>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="/invoices" class="btn btn-primary">
+        + New Invoice
+      </a>
+      <a routerLink="/payments" class="btn btn-secondary">
+        + Record Payment
+      </a>
+      <a routerLink="/intelligence" class="btn btn-ai">
+        ✦ AI Risk Engine
+      </a>
     </div>
   </div>
 
-  <!-- Statistics -->
-
+  <!-- STATS CARDS GRID -->
   <div class="stats-grid">
-
-    @for (stat of stats(); track stat.title) {
-      <div class="stat-card">
-
-        <div class="stat-icon" [class]="stat.type">
-          ●
-        </div>
-
-        <div class="stat-info">
-          <span>{{ stat.title }}</span>
-          <h2>{{ stat.value }}</h2>
-          <!-- <small>{{ stat.change }} from last month</small> -->
-        </div>
-
+    <div class="stat-card">
+      <div class="stat-icon revenue">💰</div>
+      <div class="stat-body">
+        <span class="stat-title">Total Invoiced</span>
+        <h2>${{ totalRevenue() | number: '1.2-2' }}</h2>
+        <small class="stat-sub">{{ totalInvoicesCount() }} Total Invoices Issued</small>
       </div>
-    }
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon collected">✓</div>
+      <div class="stat-body">
+        <span class="stat-title">Total Collected</span>
+        <h2 class="text-success">${{ totalCollected() | number: '1.2-2' }}</h2>
+        <small class="stat-sub text-success">{{ collectionRate() }}% Collection Efficiency</small>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon outstanding">⚠️</div>
+      <div class="stat-body">
+        <span class="stat-title">Open Receivables</span>
+        <h2 class="text-danger">${{ totalOutstanding() | number: '1.2-2' }}</h2>
+        <small class="stat-sub text-danger">{{ overdueCount() }} Overdue Accounts</small>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon clients">👥</div>
+      <div class="stat-body">
+        <span class="stat-title">Customer Accounts</span>
+        <h2>{{ totalCustomers() }}</h2>
+        <small class="stat-sub">{{ totalUsers() }} System Users Active</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS & VISUAL ANALYTICS ROW -->
+  <div class="analytics-grid">
+
+    <!-- CHART 1: AGING BUCKETS -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <div>
+          <h3>Receivables Aging Breakdown</h3>
+          <p>Distribution of outstanding receivables by days past due</p>
+        </div>
+        <span class="aging-summary-badge">Total: ${{ totalOutstanding() | number: '1.2-2' }}</span>
+      </div>
+
+      <div class="bar-chart-container">
+        <div class="chart-bars">
+          <!-- Bucket: Current -->
+          <div class="bar-col">
+            <span class="bar-val">${{ agingCurrent() | number: '1.0-0' }}</span>
+            <div class="bar-track">
+              <div class="bar-fill current" [style.height.%]="getAgingHeightPercent(agingCurrent())"></div>
+            </div>
+            <span class="bar-label">Current</span>
+            <small class="bar-sub">Due Soon</small>
+          </div>
+
+          <!-- Bucket: 1-30 Days -->
+          <div class="bar-col">
+            <span class="bar-val">${{ aging1To30() | number: '1.0-0' }}</span>
+            <div class="bar-track">
+              <div class="bar-fill warning" [style.height.%]="getAgingHeightPercent(aging1To30())"></div>
+            </div>
+            <span class="bar-label">1-30 Days</span>
+            <small class="bar-sub">Recent</small>
+          </div>
+
+          <!-- Bucket: 31-60 Days -->
+          <div class="bar-col">
+            <span class="bar-val">${{ aging31To60() | number: '1.0-0' }}</span>
+            <div class="bar-track">
+              <div class="bar-fill danger" [style.height.%]="getAgingHeightPercent(aging31To60())"></div>
+            </div>
+            <span class="bar-label">31-60 Days</span>
+            <small class="bar-sub">Moderate</small>
+          </div>
+
+          <!-- Bucket: 60+ Days -->
+          <div class="bar-col">
+            <span class="bar-val">${{ aging60Plus() | number: '1.0-0' }}</span>
+            <div class="bar-track">
+              <div class="bar-fill critical" [style.height.%]="getAgingHeightPercent(aging60Plus())"></div>
+            </div>
+            <span class="bar-label">60+ Days</span>
+            <small class="bar-sub">Critical</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART 2: RECOVERY & COLLECTION RATE GAUGE -->
+    <div class="card health-card">
+      <div class="card-header">
+        <div>
+          <h3>Liquidity & Settlement Health</h3>
+          <p>Ratio of cash collected vs outstanding debt</p>
+        </div>
+      </div>
+
+      <div class="health-gauge-box">
+        <div class="radial-meter">
+          <div class="radial-inner">
+            <span class="rate-number">{{ collectionRate() }}%</span>
+            <span class="rate-label">Recovered</span>
+          </div>
+        </div>
+
+        <div class="health-breakdown">
+          <div class="health-item">
+            <span class="dot green"></span>
+            <div>
+              <span>Cash Realized:</span>
+              <strong>${{ totalCollected() | number: '1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <div class="health-item">
+            <span class="dot red"></span>
+            <div>
+              <span>Receivables at Risk:</span>
+              <strong>${{ totalOutstanding() | number: '1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <div class="health-item">
+            <span class="dot purple"></span>
+            <div>
+              <span>Total Contract Value:</span>
+              <strong>${{ totalRevenue() | number: '1.2-2' }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 
-  <!-- Main Content -->
-
-   <div class="content-grid">
-
-    <div class="card">
-
-      <div class="card-header">
-        <div>
-          <h2>Recent Users</h2>
-          <p>Recently registered Users</p>
-        </div>
-
-        <button routerLink="/admin/users" class="view-btn">View All</button>
-      </div>
-
-      <div class="table-container">
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            @for (c of users(); track c.id) {
-              <tr>
-                <td>{{ c.name }}</td>
-                <td>{{ c.email }}</td>
-                <td>{{ c.role }}</td>
-              </tr>
-            }
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-    <div class="card activity-card">
-
-      <div class="card-header">
-        <div>
-          <h2>System Flow</h2>
-          <!-- <p>Latest activities</p> -->
-        </div>
-      </div>
-
-      <div class="activity">
-
-        <div class="activity-item">
-          <span class="dot green"></span>
-          <div>
-            <strong>New user registeration</strong>
-            <p>Only admin have rights for CR </p>
-            <small>on user</small>
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <span class="dot blue"></span>
-          <div>
-            <strong>User Page</strong>
-            <p>Show only on admin dashboard</p>
-            <small>Admin / Accountant / Sales</small>
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <span class="dot orange"></span>
-          <div>
-            <strong>Customer Page</strong>
-            <p>Every user can see the page</p>
-            <small>Accountant just view the page</small>
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <span class="dot red"></span>
-          <div>
-            <strong>Customer Page</strong>
-            <p>Only Admin have rights for CRUD</p>
-            <small>Sales can create a customer</small>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
+  <!-- RECENT TRANSACTIONS & CLIENT ACTIVITY GRID -->
   <div class="content-grid">
 
+    <!-- RECENT INVOICES -->
     <div class="card">
-
       <div class="card-header">
         <div>
-          <h2>Recent Customer</h2>
-          <p>Recently registered Customer</p>
+          <h3>Recent Invoice Transactions</h3>
+          <p>Latest issued invoices with payment statuses</p>
         </div>
-
-        <button routerLink="/customers" class="view-btn">View All</button>
+        <a routerLink="/invoices" class="view-link">View All Invoices →</a>
       </div>
 
-      <div class="table-container">
+      <div class="table-responsive">
+        @if (loading()) {
+          <p class="p-4 text-muted">Loading live records...</p>
+        } @else {
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Customer</th>
+                <th>Due Date</th>
+                <th class="text-right">Total</th>
+                <th class="text-right">Balance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (inv of invoices(); track inv.id) {
+                <tr>
+                  <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
+                  <td>{{ inv.customerName }}</td>
+                  <td class="text-muted">{{ inv.dueDate }}</td>
+                  <td class="text-right">${{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td class="text-right font-medium" [class.text-danger]="inv.outstandingAmount > 0">
+                    ${{ inv.outstandingAmount | number: '1.2-2' }}
+                  </td>
+                  <td>
+                    <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
+                      {{ inv.status }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="text-center p-4 text-muted">No invoices found</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
 
-        <table>
+    <!-- RECENT REGISTERED CUSTOMERS -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3>Client Directory</h3>
+          <p>Recently registered customers</p>
+        </div>
+        <a routerLink="/customers" class="view-link">View Customers →</a>
+      </div>
 
+      <div class="table-responsive">
+        <table class="dashboard-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Client Name</th>
               <th>Email</th>
-              <th>Address</th>
               <th>Status</th>
             </tr>
           </thead>
-
           <tbody>
-
             @for (c of customers(); track c.id) {
               <tr>
-                <td>{{ c.name }}</td>
-                <td>{{ c.email }}</td>
-                <td>{{ c.address }}</td>
                 <td>
-                  <span
-                    class="status"
-                    [class.active]="c.isActive"
-                    [class.inactive]="!c.isActive"
-                  >
-                    {{ c.isActive ? 'Active' : 'InActive'}}
+                  <div class="customer-cell">
+                    <span class="avatar-small">{{ c.name.charAt(0) || 'C' }}</span>
+                    <strong>{{ c.name }}</strong>
+                  </div>
+                </td>
+                <td class="text-muted">{{ c.email || 'No email' }}</td>
+                <td>
+                  <span class="status-pill" [class.active]="c.isActive" [class.inactive]="!c.isActive">
+                    {{ c.isActive ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
               </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="text-center p-4 text-muted">No customers registered</td>
+              </tr>
             }
-
           </tbody>
-
         </table>
-
       </div>
-
     </div>
 
   </div>
