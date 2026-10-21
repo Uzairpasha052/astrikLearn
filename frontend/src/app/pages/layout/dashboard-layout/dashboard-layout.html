@@ -22,7 +22,8 @@
         class="nav-item"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span class="nav-icon">📊</span>
+        <span class="nav-icon">D</span> 
+        <!-- 📊 -->
         <span class="nav-text">Dashboard</span>
       </a>
 
@@ -31,7 +32,8 @@
         routerLinkActive="active"
         class="nav-item"
       >
-        <span class="nav-icon">📄</span>
+        <span class="nav-icon">I</span>
+        <!-- 📄 -->
         <span class="nav-text">Invoices</span>
       </a>
 
@@ -40,7 +42,8 @@
         routerLinkActive="active"
         class="nav-item"
       >
-        <span class="nav-icon">💳</span>
+        <span class="nav-icon">P</span>
+        <!-- 💳 -->
         <span class="nav-text">Payments & Allocations</span>
       </a>
 
@@ -49,7 +52,8 @@
         routerLinkActive="active"
         class="nav-item"
       >
-        <span class="nav-icon">👥</span>
+        <span class="nav-icon">C</span>
+        <!-- 👥 -->
         <span class="nav-text">Customers</span>
       </a>
 
@@ -58,7 +62,8 @@
         routerLinkActive="active"
         class="nav-item"
       >
-        <span class="nav-icon">🔔</span>
+        <span class="nav-icon">P</span>
+        <!-- 🔔 -->
         <span class="nav-text">Payment Reminders</span>
       </a>
 
@@ -82,7 +87,8 @@
           routerLinkActive="active"
           class="nav-item"
         >
-          <span class="nav-icon">🛡</span>
+          <span class="nav-icon">U</span>
+          <!-- 🛡 -->
           <span class="nav-text">User Directory</span>
         </a>
 
@@ -91,7 +97,8 @@
           routerLinkActive="active"
           class="nav-item"
         >
-          <span class="nav-icon">➕</span>
+          <span class="nav-icon">R</span>
+          <!-- ➕ -->
           <span class="nav-text">Register User</span>
         </a>
       }
@@ -99,7 +106,7 @@
 
     <!-- Sidebar Footer / Current User Profile -->
     <div class="sidebar-bottom">
-      <div class="user-brief">
+      <!-- <div class="user-brief">
         <div class="user-avatar">
           {{ user()?.name?.charAt(0) || 'U' }}
         </div>
@@ -107,7 +114,7 @@
           <strong class="user-name">{{ user()?.name || 'Staff User' }}</strong>
           <span class="user-role-badge" [class]="user()?.role?.toLowerCase()">{{ user()?.role || 'User' }}</span>
         </div>
-      </div>
+      </div> -->
 
       <button class="logout-btn" (click)="logout()" title="Sign out of system">
         <span class="nav-icon">🚪</span>
@@ -135,10 +142,10 @@
       </div>
 
       <div class="topbar-right">
-        <div class="quick-status">
+        <!-- <div class="quick-status">
           <span class="status-indicator"></span>
           <span class="status-text">Core API Connected</span>
-        </div>
+        </div> -->
 
         <div class="user-chip">
           <div class="chip-avatar">

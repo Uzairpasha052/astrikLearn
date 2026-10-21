@@ -51,6 +51,7 @@ public class ReminderController : ControllerBase
         return Ok(reminder);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreateReminderDto dto)
@@ -72,6 +73,7 @@ public class ReminderController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(
         int id,
@@ -95,6 +97,7 @@ public class ReminderController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

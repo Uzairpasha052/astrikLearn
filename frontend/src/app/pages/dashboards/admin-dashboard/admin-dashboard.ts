@@ -67,7 +67,7 @@ export class AdminDashboard implements OnInit {
     });
 
     // 3. Load invoices & compute financial analytics
-    this.invoiceService.getInvoices(1, 100).subscribe({
+    this.invoiceService.getInvoices(1, 10).subscribe({
       next: (res) => {
         const items = res.items;
         this.invoices.set(items.slice(0, 6)); // top recent

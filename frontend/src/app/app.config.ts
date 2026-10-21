@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
 
     // provideAnimationAsync(),
     provideToastr({
-      timeOut: 4000,
+      timeOut: 2000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
       progressBar: true,

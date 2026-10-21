@@ -15,7 +15,7 @@
 .sidebar {
   width: 260px;
   height: 100vh;
-  background: #0f172a;
+  background: #efefe8;
   color: #f8fafc;
   position: fixed;
   left: 0;
@@ -25,7 +25,7 @@
   transition: width 0.22s ease-in-out;
   z-index: 1000;
   overflow-y: auto;
-  border-right: 1px solid #1e293b;
+  border-right: 1px solid #c4c4c4;
 }
 
 /* Logo */
@@ -35,21 +35,21 @@
   align-items: center;
   gap: 12px;
   padding: 0 20px;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid #cbcdd1;
   white-space: nowrap;
 }
 
 .logo-icon {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #8b86e6, #9470d3);
   border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 14px;
-  color: #ffffff;
+  color: #0e0d0d;
   letter-spacing: 0.5px;
   box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
 }
@@ -62,13 +62,13 @@
 .brand-name {
   font-size: 17px;
   font-weight: 800;
-  color: #ffffff;
+  color: #0e0d0d;
   letter-spacing: -0.3px;
 }
 
 .brand-sub {
   font-size: 11px;
-  color: #94a3b8;
+  color: #6f7b8b;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -80,7 +80,7 @@
 }
 
 .menu-title {
-  color: #64748b;
+  color: #444f5e;
   font-size: 10px;
   font-weight: 700;
   padding: 10px 12px 6px;
@@ -94,7 +94,8 @@
   height: 42px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  // color: #94a3b8;
+  color: black;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -104,31 +105,32 @@
   cursor: pointer;
   font-size: 13.5px;
   font-weight: 500;
-  margin-bottom: 4px;
+  // margin-bottom: 4px;
   transition: all 0.15s ease;
 }
 
 .nav-item:hover,
 .logout-btn:hover {
-  background: #1e293b;
+  background: #929aa8;
   color: #ffffff;
 }
 
 .nav-item.active {
-  background: #4f46e5;
+  background: #565b63;
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 .nav-ai.active {
-  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+  background: linear-gradient(135deg, #929aa8, #565b63);
 }
 
 .nav-icon {
   width: 22px;
   text-align: center;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .nav-text {
@@ -138,8 +140,8 @@
 /* Sidebar Bottom & User Profile */
 .sidebar-bottom {
   padding: 16px 14px;
-  border-top: 1px solid #1e293b;
-  background: #0b1120;
+  border-top: 1px solid #cbcdd1;
+  background: #ddddd6;
 }
 
 .user-brief {
@@ -185,7 +187,7 @@
 }
 
 .logout-btn {
-  color: #ef4444;
+  color: #e30d0d;
 }
 
 .logout-btn:hover {
@@ -207,7 +209,7 @@
 /* Topbar */
 .topbar {
   height: 72px;
-  background: #ffffff;
+  background: #efefe8;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -228,7 +230,7 @@
   width: 38px;
   height: 38px;
   border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  background: #e7e7e0;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
@@ -252,7 +254,7 @@
 
 .company-tag {
   font-weight: 700;
-  color: #4f46e5;
+  color: #0b0b0b;
 }
 
 .divider {
@@ -321,7 +323,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #4f46e5;
+  // background: #4f46e5;
+  background: linear-gradient(135deg, #8b86e6, #9470d3);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -351,6 +354,10 @@
 /* =========================
    SIDEBAR CLOSED
 ========================= */
+
+.sidebar{
+  scrollbar-width: none;
+}
 
 .sidebar-closed .sidebar {
   width: 75px;

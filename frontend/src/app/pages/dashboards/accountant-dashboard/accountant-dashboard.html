@@ -3,9 +3,9 @@
   <!-- HEADER -->
   <div class="dashboard-header">
     <div>
-      <div class="badge-tag">FINANCIAL LEDGER & CONTROLLER</div>
+      <div class="badge-tag">FINANCIAL LEDGER </div>
       <h1>Accountant Operations Dashboard</h1>
-      <p>Billing control, cash allocation, aging monitoring, and credit follow-ups.</p>
+      <!-- <p>Billing control, cash allocation, aging monitoring, and credit follow-ups.</p> -->
     </div>
 
     <div class="header-actions">
@@ -21,7 +21,7 @@
       <div class="stat-icon revenue">💵</div>
       <div>
         <span class="stat-label">Total Invoiced</span>
-        <h2>${{ totalInvoiced() | number: '1.2-2' }}</h2>
+        <h2>{{ totalInvoiced() | number: '1.2-2' }}</h2>
         <small class="stat-sub">Gross Billed Portfolio</small>
       </div>
     </div>
@@ -30,7 +30,7 @@
       <div class="stat-icon collections">✓</div>
       <div>
         <span class="stat-label">Collected Collections</span>
-        <h2 class="text-success">${{ totalCollected() | number: '1.2-2' }}</h2>
+        <h2 class="text-success">{{ totalCollected() | number: '1.2-2' }}</h2>
         <small class="stat-sub text-success">{{ recoveryRate() }}% Settled</small>
       </div>
     </div>
@@ -39,8 +39,8 @@
       <div class="stat-icon receivables">⚠️</div>
       <div>
         <span class="stat-label">Unpaid Receivables</span>
-        <h2 class="text-danger">${{ totalOutstanding() | number: '1.2-2' }}</h2>
-        <small class="stat-sub text-danger">{{ overdueInvoices() }} Overdue</small>
+        <h2 class="text-danger">{{ totalOutstanding() | number: '1.2-2' }}</h2>
+         <small class="stat-sub text-danger"> <!-- {{ overdueInvoices() }} --> Overdue</small> 
       </div>
     </div>
 
@@ -48,7 +48,7 @@
       <div class="stat-icon treasury">🏦</div>
       <div>
         <span class="stat-label">Unallocated Cash</span>
-        <h2 class="text-warning">${{ unallocatedCash() | number: '1.2-2' }}</h2>
+        <h2 class="text-warning">{{ unallocatedCash() | number: '1.2-2' }}</h2>
         <small class="stat-sub">Pending Allocation to Invoices</small>
       </div>
     </div>
@@ -67,35 +67,35 @@
     <div class="aging-strip">
       <div class="aging-box current">
         <span class="box-title">Current (Not Overdue)</span>
-        <strong>${{ agingCurrent() | number: '1.2-2' }}</strong>
+        <strong>{{ agingCurrent() | number: '1.2-2' }}</strong>
         <small>Due within credit window</small>
       </div>
 
       <div class="aging-box warning">
         <span class="box-title">1 - 30 Days Overdue</span>
-        <strong>${{ aging1To30() | number: '1.2-2' }}</strong>
+        <strong>{{ aging1To30() | number: '1.2-2' }}</strong>
         <small>Courtesy reminder due</small>
       </div>
 
       <div class="aging-box danger">
         <span class="box-title">31 - 60 Days Overdue</span>
-        <strong>${{ aging31To60() | number: '1.2-2' }}</strong>
+        <strong>{{ aging31To60() | number: '1.2-2' }}</strong>
         <small>Escalate credit follow-up</small>
       </div>
 
       <div class="aging-box critical">
         <span class="box-title">60+ Days Overdue</span>
-        <strong>${{ aging60Plus() | number: '1.2-2' }}</strong>
+        <strong>{{ aging60Plus() | number: '1.2-2' }}</strong>
         <small>Critical default risk</small>
       </div>
     </div>
   </div>
 
   <!-- TABLES GRID -->
-  <div class="content-grid">
+  <!-- <div class="content-grid"> -->
 
     <!-- RECENT INVOICES -->
-    <div class="card">
+    <div class="card aging-strip-card">
       <div class="card-header">
         <div>
           <h3>Recent Invoices</h3>
@@ -113,8 +113,8 @@
               <tr>
                 <th>Invoice</th>
                 <th>Customer</th>
-                <th class="text-right">Total</th>
-                <th class="text-right">Due Balance</th>
+                <th >Total</th>
+                <th >Due Balance</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -123,9 +123,9 @@
                 <tr>
                   <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
                   <td>{{ inv.customerName }}</td>
-                  <td class="text-right">${{ inv.totalAmount | number: '1.2-2' }}</td>
-                  <td class="text-right font-medium" [class.text-danger]="inv.outstandingAmount > 0">
-                    ${{ inv.outstandingAmount | number: '1.2-2' }}
+                  <td >{{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td class=" font-medium" [class.text-danger]="inv.outstandingAmount > 0">
+                    {{ inv.outstandingAmount | number: '1.2-2' }}
                   </td>
                   <td>
                     <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
@@ -145,7 +145,7 @@
     </div>
 
     <!-- RECENT PAYMENTS -->
-    <div class="card">
+    <div class="card aging-strip-card">
       <div class="card-header">
         <div>
           <h3>Recent Cash Receipts</h3>
@@ -160,7 +160,7 @@
             <tr>
               <th>Date</th>
               <th>Customer</th>
-              <th class="text-right">Amount</th>
+              <th >Amount</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -169,7 +169,7 @@
               <tr>
                 <td class="text-muted">{{ p.paymentDate }}</td>
                 <td><strong>{{ p.customerName }}</strong></td>
-                <td class="text-right text-success font-bold">${{ p.amount | number: '1.2-2' }}</td>
+                <td class=" text-success font-bold">{{ p.amount | number: '1.2-2' }}</td>
                 <td>
                   @if (p.unallocatedAmount > 0) {
                     <span class="badge-pending">Unallocated</span>
@@ -188,6 +188,6 @@
       </div>
     </div>
 
-  </div>
+  <!-- </div> -->
 
 </div>

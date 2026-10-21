@@ -23,5 +23,5 @@ public interface IReminderRepository
 
     Task<bool> ExistsAsync(int id);
 
-    Task<bool> SaveChangesAsync();
+    Task<bool> SaveChanges();
 }

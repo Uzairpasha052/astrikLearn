@@ -26,17 +26,18 @@ export class Login {
     this.showPassword = !this.showPassword;
   }
 
-  fillDemo(role: 'admin' | 'accountant' | 'sales'): void {
+  fillDemo(role: 'admin'): void{ // | 'accountant' | 'sales'): void {
     if (role === 'admin') {
-      this.email = 'admin@gamil.com';
-      this.password = 'admin123';
-    } else if (role === 'accountant') {
-      this.email = 'accountant@project.com';
-      this.password = 'acc123456';
-    } else {
-      this.email = 'sales@project.com';
-      this.password = 'sales123456';
-    }
+      this.email = 'uu@gmail.com';
+      this.password = 'uu1234';
+    } 
+    // else if (role === 'accountant') {
+    //   this.email = 'accountant@project.com';
+    //   this.password = 'acc123456';
+    // } else {
+    //   this.email = 'sales@project.com';
+    //   this.password = 'sales123456';
+    // }
   }
 
   login(): void {
@@ -70,7 +71,7 @@ export class Login {
             } else {
               this.router.navigate(['/invoices']);
             }
-          }, 350);
+          }, 300);
         },
         error: (err) => {
           this.loading.set(false);

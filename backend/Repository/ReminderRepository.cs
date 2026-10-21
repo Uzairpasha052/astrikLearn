@@ -104,7 +104,7 @@ public class ReminderRepository : IReminderRepository
             .AnyAsync(r => r.Id == id && !r.IsDeleted);
     }
 
-    public async Task<bool> SaveChangesAsync()
+    public async Task<bool> SaveChanges()
     {
         return await _context.SaveChangesAsync() > 0;
     }

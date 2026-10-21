@@ -26,8 +26,8 @@ export class Invoice implements OnInit {
   private toast = inject(ToastrService);
 
   // Role permissions
-  canCreate = this.authService.hasRole('Admin', 'Accountant', 'Sales');
-  canEditDelete = this.authService.hasRole('Admin', 'Accountant');
+  canCreate = this.authService.hasRole('Admin', 'Sales');
+  canEditDelete = this.authService.hasRole('Admin');
 
   // State signals
   invoices = signal<InvoiceDisplayDto[]>([]);
@@ -35,7 +35,7 @@ export class Invoice implements OnInit {
   loading = signal(false);
   saving = signal(false);
   deletingId = signal<number | null>(null);
-
+ 
   // Search & Filters
   searchTerm = signal('');
   selectedStatus = signal('ALL');

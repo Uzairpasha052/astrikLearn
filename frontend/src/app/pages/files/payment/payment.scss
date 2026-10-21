@@ -136,6 +136,8 @@
 .table-responsive {
   overflow-x: auto;
   width: 100%;
+
+  scrollbar-width: none;
 }
 
 .data-table {
@@ -360,6 +362,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+
+  scrollbar-width: none;
 }
 
 .modal-md {

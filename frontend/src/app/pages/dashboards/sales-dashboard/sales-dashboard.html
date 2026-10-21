@@ -5,7 +5,7 @@
     <div>
       <div class="badge-tag">REVENUE & CLIENT ACQUISITION</div>
       <h1>Sales Performance Portal</h1>
-      <p>Monitor deal value, customer pipeline, active billings, and account performance.</p>
+      <!-- <p>Monitor deal value, customer pipeline, active billings, and account performance.</p> -->
     </div>
 
     <div class="header-actions">
@@ -20,7 +20,7 @@
       <div class="stat-icon sales">📈</div>
       <div>
         <span class="stat-label">Total Invoiced Sales</span>
-        <h2>${{ totalSalesValue() | number: '1.2-2' }}</h2>
+        <h2>{{ totalSalesValue() | number: '1.2-2' }}</h2>
         <small class="stat-sub">Across {{ totalInvoicesCount() }} Deals Closed</small>
       </div>
     </div>
@@ -38,7 +38,7 @@
       <div class="stat-icon deals">🎯</div>
       <div>
         <span class="stat-label">Average Deal Size</span>
-        <h2 class="text-primary">${{ avgDealSize() | number: '1.0-0' }}</h2>
+        <h2 class="text-primary">{{ avgDealSize() | number: '1.0-0' }}</h2>
         <small class="stat-sub">Average Revenue per Invoice</small>
       </div>
     </div>
@@ -47,14 +47,14 @@
       <div class="stat-icon pending">⏳</div>
       <div>
         <span class="stat-label">Pending Client Collections</span>
-        <h2 class="text-warning">${{ pendingRevenue() | number: '1.2-2' }}</h2>
+        <h2 class="text-warning">{{ pendingRevenue() | number: '1.2-2' }}</h2>
         <small class="stat-sub">Awaiting Customer Settlement</small>
       </div>
     </div>
   </div>
 
   <!-- MAIN GRID -->
-  <div class="content-grid">
+  <!-- <div class="content-grid"> -->
 
     <!-- RECENT SALES INVOICES -->
     <div class="card">
@@ -75,8 +75,8 @@
               <tr>
                 <th>Invoice</th>
                 <th>Client</th>
-                <th class="text-right">Total Deal</th>
-                <th class="text-right">Balance</th>
+                <th >Total Deal</th>
+                <th >Balance</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -85,9 +85,9 @@
                 <tr>
                   <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
                   <td><strong>{{ inv.customerName }}</strong></td>
-                  <td class="text-right font-medium">${{ inv.totalAmount | number: '1.2-2' }}</td>
-                  <td class="text-right" [class.text-danger]="inv.outstandingAmount > 0">
-                    ${{ inv.outstandingAmount | number: '1.2-2' }}
+                  <td class=" font-medium">${{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td  [class.text-danger]="inv.outstandingAmount > 0">
+                    {{ inv.outstandingAmount | number: '1.2-2' }}
                   </td>
                   <td>
                     <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
@@ -152,6 +152,6 @@
       </div>
     </div>
 
-  </div>
+  <!-- </div> -->
 
 </div>

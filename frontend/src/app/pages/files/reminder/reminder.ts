@@ -26,7 +26,7 @@ export class Reminder implements OnInit {
   private fb = inject(FormBuilder);
   private toast = inject(ToastrService);
 
-  canManage = this.authService.hasRole('Admin', 'Accountant', 'Sales');
+  canManage = this.authService.hasRole('Admin');
 
   reminders = signal<ReminderDisplayDto[]>([]);
   invoices = signal<InvoiceDisplayDto[]>([]);

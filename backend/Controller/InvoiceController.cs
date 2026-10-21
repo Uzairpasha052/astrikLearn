@@ -32,16 +32,7 @@ public class InvoiceController : ControllerBase
 
         return null;
     }
-    //private int? GetUserId()
-    //{
-    //    var value = User.FindFirstValue(
-    //        ClaimTypes.NameIdentifier);
-
-    //    return int.TryParse(value, out var id)
-    //        ? id
-    //        : null;
-    //}
-
+   
     [HttpGet]
     public async Task<IActionResult> GetAllInvoice([FromQuery] PaginationRequest request)
     {
@@ -63,6 +54,7 @@ public class InvoiceController : ControllerBase
         return Ok(invoice);
     }
 
+    [Authorize(Roles = "Admin, Sales")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateInvoiceDto dto)
     {
@@ -86,6 +78,7 @@ public class InvoiceController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateInvoiceDto dto)
     {
@@ -111,6 +104,7 @@ public class InvoiceController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

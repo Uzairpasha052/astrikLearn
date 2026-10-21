@@ -38,6 +38,7 @@ public class PaymentController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin, Accountant")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreatePaymentDto dto)
@@ -59,6 +60,7 @@ public class PaymentController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin, Accountant")]
     [HttpPost("{paymentId:int}/allocations")]
     public async Task<IActionResult> Allocate(
         int paymentId,

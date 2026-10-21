@@ -5,7 +5,7 @@
     <div>
       <div class="badge-tag">FINANCIAL MANAGEMENT</div>
       <h1>Invoices & Receivables</h1>
-      <p>Issue, monitor, and track customer billing with aging analysis and risk intelligence.</p>
+      <!-- <p>Issue, monitor, and track customer billing with aging analysis and risk intelligence.</p> -->
     </div>
 
     <div class="header-actions">
@@ -20,7 +20,7 @@
   <!-- CONTROL & FILTER BAR -->
   <div class="filters-card">
     <div class="search-box">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input
         type="text"
         placeholder="Search invoice number or customer..."
@@ -105,13 +105,13 @@
                   </span>
                 </td>
                 <td class="text-right font-medium">
-                  ${{ inv.totalAmount | number: '1.2-2' }}
+                  {{ inv.totalAmount | number: '1.2-2' }}
                 </td>
                 <td class="text-right text-success font-medium">
-                  ${{ inv.amountPaid | number: '1.2-2' }}
+                  {{ inv.amountPaid | number: '1.2-2' }}
                 </td>
                 <td class="text-right font-bold" [class.text-danger]="inv.outstandingAmount > 0">
-                  ${{ inv.outstandingAmount | number: '1.2-2' }}
+                  {{ inv.outstandingAmount | number: '1.2-2' }}
                 </td>
                 <td>
                   <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
@@ -130,7 +130,7 @@
                 <td class="text-right">
                   <div class="action-buttons">
                     <button class="btn-sm btn-outline" (click)="viewDetails(inv)" title="View Receipt">
-                      👁
+                      👁️
                     </button>
 
                     @if (canEditDelete) {
@@ -253,7 +253,7 @@
                   <tr>
                     <th style="width: 50%;">Item Description</th>
                     <th style="width: 15%;">Quantity</th>
-                    <th style="width: 20%;">Unit Price ($)</th>
+                    <th style="width: 20%;">Unit Price (PKR)</th>
                     <th style="width: 10%;" class="text-right">Total</th>
                     <th style="width: 5%;"></th>
                   </tr>
@@ -288,7 +288,7 @@
                         />
                       </td>
                       <td class="text-right font-medium">
-                        ${{ getItemLineTotal($index) | number: '1.2-2' }}
+                        {{ getItemLineTotal($index) | number: '1.2-2' }}
                       </td>
                       <td class="text-center">
                         <button
@@ -309,11 +309,11 @@
             <div class="grand-total-card">
               <div class="total-row">
                 <span>Subtotal:</span>
-                <strong>${{ getCalculatedGrandTotal() | number: '1.2-2' }}</strong>
+                <strong>{{ getCalculatedGrandTotal() | number: '1.2-2' }}</strong>
               </div>
               <div class="total-row grand">
                 <span>Total Invoice Balance:</span>
-                <span class="total-amount">${{ getCalculatedGrandTotal() | number: '1.2-2' }}</span>
+                <span class="total-amount">{{ getCalculatedGrandTotal() | number: '1.2-2' }}</span>
               </div>
             </div>
           </div>
@@ -375,8 +375,8 @@
                 <tr>
                   <td>{{ item.description }}</td>
                   <td class="text-center">{{ item.quantity }}</td>
-                  <td class="text-right">${{ item.unitPrice | number: '1.2-2' }}</td>
-                  <td class="text-right">${{ (item.amount || (item.quantity * item.unitPrice)) | number: '1.2-2' }}</td>
+                  <td class="text-right">{{ item.unitPrice | number: '1.2-2' }}</td>
+                  <td class="text-right">{{ (item.amount || (item.quantity * item.unitPrice)) | number: '1.2-2' }}</td>
                 </tr>
               }
             </tbody>
@@ -385,15 +385,15 @@
           <div class="receipt-summary">
             <div class="summary-line">
               <span>Total Invoice Amount:</span>
-              <span>${{ selectedInvoice()!.totalAmount | number: '1.2-2' }}</span>
+              <span>{{ selectedInvoice()!.totalAmount | number: '1.2-2' }}</span>
             </div>
             <div class="summary-line text-success">
               <span>Allocated / Paid Amount:</span>
-              <span>${{ selectedInvoice()!.amountPaid | number: '1.2-2' }}</span>
+              <span>{{ selectedInvoice()!.amountPaid | number: '1.2-2' }}</span>
             </div>
             <div class="summary-line total-due">
               <span>Remaining Balance:</span>
-              <span class="due-amount">${{ selectedInvoice()!.outstandingAmount | number: '1.2-2' }}</span>
+              <span class="due-amount">{{ selectedInvoice()!.outstandingAmount | number: '1.2-2' }}</span>
             </div>
           </div>
         </div>

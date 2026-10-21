@@ -3,9 +3,9 @@
   <!-- PAGE HEADER -->
   <div class="page-header">
     <div>
-      <div class="badge-tag">DUNNING & NOTIFICATIONS</div>
+      <div class="badge-tag">NOTIFICATIONS</div>
       <h1>Payment Reminders & Follow-ups</h1>
-      <p>Schedule proactive credit notifications, formal notices, and follow-up reminders for open receivables.</p>
+      <!-- <p>Schedule proactive credit notifications, formal notices, and follow-up reminders for open receivables.</p> -->
     </div>
 
     <div class="header-actions">
@@ -20,7 +20,7 @@
   <!-- FILTERS & CONTROLS -->
   <div class="filters-card">
     <div class="search-box">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input
         type="text"
         placeholder="Search customer, invoice #, or message notes..."
@@ -65,8 +65,10 @@
               <th>Invoice #</th>
               <th>Channel</th>
               <th>Message / Action Notes</th>
-              <th>Status</th>
-              <th class="text-right">Actions</th>
+              <!-- <th>Status</th> -->
+              @if (canManage) {
+                <th >Actions</th>
+              }
             </tr>
           </thead>
           <tbody>
@@ -88,11 +90,11 @@
                 <td class="message-cell text-muted">
                   {{ r.message || 'Standard follow-up memo' }}
                 </td>
-                <td>
+                <!-- <td>
                   <span class="status-pill" [class]="r.status.toLowerCase()">
                     {{ r.status || 'Scheduled' }}
                   </span>
-                </td>
+                </td> -->
                 <td class="text-right">
                   <div class="action-buttons">
                     @if (canManage) {
@@ -188,7 +190,7 @@
             </div>
 
             <div class="form-group flex-1">
-              <label>Communication Channel <span class="required">*</span></label>
+              <label>Reminder Type <span class="required">*</span></label>
               <select formControlName="reminderType" (change)="onTypeChange()" class="form-control">
                 <option value="Email">Email</option>
                 <option value="Phone Call">Phone Call</option>

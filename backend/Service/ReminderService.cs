@@ -51,7 +51,7 @@ public class ReminderService
             ReminderDate = dto.ReminderDate,
             ReminderType = dto.ReminderType.Trim(),
             Message = dto.Message?.Trim(),
-            Status = "Pending",
+            //Status = "Pending",
             CreatedAt = DateTime.UtcNow,
             CreatedBy = userId,
             IsActive = true,
@@ -59,7 +59,7 @@ public class ReminderService
         };
 
         await _repository.CreateAsync(reminder);
-        await _repository.SaveChangesAsync();
+        await _repository.SaveChanges();
 
         var created = await _repository.GetByIdAsync(reminder.Id);
 
@@ -77,16 +77,16 @@ public class ReminderService
         UpdateReminderDto dto,
         int? userId)
     {
-        var existing = await _repository.GetByIdAsync(id);
+        var existing = await _repository.GetTrackedByIdAsync(id);
 
         if (existing == null)
             return null;
 
-        if (existing.Status != "Pending")
-        {
-            throw new InvalidOperationException(
-                "Only pending reminders can be updated.");
-        }
+        //if (existing.Status != "Pending")
+        //{
+        //    throw new InvalidOperationException(
+        //        "Only pending reminders can be updated.");
+        //}
 
         existing.ReminderDate = dto.ReminderDate;
         existing.ReminderType = dto.ReminderType.Trim();
@@ -94,7 +94,7 @@ public class ReminderService
         existing.UpdatedAt = DateTime.UtcNow;
         existing.UpdatedBy = userId;
 
-        await _repository.SaveChangesAsync();
+        await _repository.SaveChanges();
         var updated = await _repository.GetByIdAsync(id);
 
         return updated == null ? null : MapToDto(updated);
@@ -102,7 +102,7 @@ public class ReminderService
 
     public async Task<bool> DeleteAsync(int id, int? userId)
     {
-        var existing = await _repository.GetByIdAsync(id);
+        var existing = await _repository.GetTrackedByIdAsync(id);
 
         if (existing == null)
             return false;
@@ -112,7 +112,7 @@ public class ReminderService
         existing.UpdatedAt = DateTime.UtcNow;
         existing.UpdatedBy = userId;
 
-        await _repository.SaveChangesAsync();
+        await _repository.SaveChanges();
 
         return true;
     }

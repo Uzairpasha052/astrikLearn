@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controller;
 
-// [Authorize]
 [ApiController]
 [Route("api/auth")]
 public class AuthController : ControllerBase

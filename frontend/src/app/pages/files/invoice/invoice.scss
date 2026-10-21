@@ -140,6 +140,8 @@
 .table-responsive {
   overflow-x: auto;
   width: 100%;
+
+  scrollbar-width: none;
 }
 
 .data-table {
@@ -405,6 +407,7 @@
   justify-content: center;
   z-index: 9999;
   padding: 20px;
+
 }
 
 .modal-window {
@@ -416,6 +419,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+
+  scrollbar-width: none;
 }
 
 .modal-sm {
