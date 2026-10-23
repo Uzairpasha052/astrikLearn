@@ -24,7 +24,8 @@
   flex-direction: column;
   transition: width 0.22s ease-in-out;
   z-index: 1000;
-  overflow-y: auto;
+  // overflow-y: auto;
+  overflow: hidden;
   border-right: 1px solid #c4c4c4;
 }
 
@@ -37,6 +38,8 @@
   padding: 0 20px;
   border-bottom: 1px solid #cbcdd1;
   white-space: nowrap;
+
+  flex-shrink: 0;
 }
 
 .logo-icon {
@@ -77,6 +80,11 @@
 .navigation {
   flex: 1;
   padding: 20px 14px;
+
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 
 .menu-title {
@@ -135,6 +143,11 @@
 
 .nav-text {
   white-space: nowrap;
+}
+
+.nav-text-logout{
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* Sidebar Bottom & User Profile */

@@ -15,43 +15,43 @@
       <a routerLink="/payments" class="btn btn-secondary">
         + Record Payment
       </a>
-      <a routerLink="/intelligence" class="btn btn-ai">
+      <!-- <a routerLink="/intelligence" class="btn btn-ai">
         ✦ AI Risk Engine
-      </a>
+      </a> -->
     </div>
   </div>
 
   <!-- STATS CARDS GRID -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon revenue">💰</div>
+      <!-- <div class="stat-icon revenue">💰</div> -->
       <div class="stat-body">
         <span class="stat-title">Total Invoiced</span>
-        <h2>{{ totalRevenue() | number: '1.2-2' }}</h2>
+        <h2>{{ totalRevenue() }}</h2>
         <small class="stat-sub">{{ totalInvoicesCount() }} Total Invoices Issued</small>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon collected">✓</div>
+      <!-- <div class="stat-icon collected">✓</div> -->
       <div class="stat-body">
         <span class="stat-title">Total Collected</span>
-        <h2 class="text-success">{{ totalCollected() | number: '1.2-2' }}</h2>
+        <h2 class="text-success">{{ totalCollected()  }}</h2>
         <small class="stat-sub text-success">{{ collectionRate() }}% Collection Efficiency</small>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon outstanding">⚠️</div>
+      <!-- <div class="stat-icon outstanding">⚠️</div> -->
       <div class="stat-body">
         <span class="stat-title">Open Receivables</span>
-        <h2 class="text-danger">{{ totalOutstanding() | number: '1.2-2' }}</h2>
+        <h2 class="text-danger">{{ totalOutstanding()  }}</h2>
          <small class="stat-sub text-danger"> <!--{{ overdueCount() }} --> Overdue</small> 
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon clients">👥</div>
+      <!-- <div class="stat-icon clients">👥</div> -->
       <div class="stat-body">
         <span class="stat-title">Customer Acc</span>
         <h2>{{ totalCustomers() }}</h2>
@@ -70,14 +70,14 @@
           <h3>Receivables Aging Breakdown</h3>
           <p>Distribution of outstanding receivables by days past due</p>
         </div>
-        <span class="aging-summary-badge">Total: ${{ totalOutstanding() | number: '1.2-2' }}</span>
+        <span class="aging-summary-badge">Total: {{ totalOutstanding()  }}</span>
       </div>
 
       <div class="bar-chart-container">
         <div class="chart-bars">
           <!-- Bucket: Current -->
           <div class="bar-col">
-            <span class="bar-val">${{ agingCurrent() | number: '1.0-0' }}</span>
+            <span class="bar-val">{{ agingCurrent() | number: '1.0-0' }}</span>
             <div class="bar-track">
               <div class="bar-fill current" [style.height.%]="getAgingHeightPercent(agingCurrent())"></div>
             </div>
@@ -87,7 +87,7 @@
 
           <!-- Bucket: 1-30 Days -->
           <div class="bar-col">
-            <span class="bar-val">${{ aging1To30() | number: '1.0-0' }}</span>
+            <span class="bar-val">{{ aging1To30() | number: '1.0-0' }}</span>
             <div class="bar-track">
               <div class="bar-fill warning" [style.height.%]="getAgingHeightPercent(aging1To30())"></div>
             </div>
@@ -97,7 +97,7 @@
 
           <!-- Bucket: 31-60 Days -->
           <div class="bar-col">
-            <span class="bar-val">${{ aging31To60() | number: '1.0-0' }}</span>
+            <span class="bar-val">{{ aging31To60() | number: '1.0-0' }}</span>
             <div class="bar-track">
               <div class="bar-fill danger" [style.height.%]="getAgingHeightPercent(aging31To60())"></div>
             </div>
@@ -107,7 +107,7 @@
 
           <!-- Bucket: 60+ Days -->
           <div class="bar-col">
-            <span class="bar-val">${{ aging60Plus() | number: '1.0-0' }}</span>
+            <span class="bar-val">{{ aging60Plus() | number: '1.0-0' }}</span>
             <div class="bar-track">
               <div class="bar-fill critical" [style.height.%]="getAgingHeightPercent(aging60Plus())"></div>
             </div>
@@ -147,7 +147,7 @@
             <span class="dot green"></span>
             <div>
               <span>Cash Realized:</span>
-              <strong>${{ totalCollected() | number: '1.2-2' }}</strong>
+              <strong>{{ totalCollected() }}</strong>
             </div>
           </div>
 
@@ -155,7 +155,7 @@
             <span class="dot red"></span>
             <div>
               <span>Receivables at Risk:</span>
-              <strong>${{ totalOutstanding() | number: '1.2-2' }}</strong>
+              <strong>{{ totalOutstanding()  }}</strong>
             </div>
           </div>
 
@@ -163,7 +163,7 @@
             <span class="dot purple"></span>
             <div>
               <span>Total Contract Value:</span>
-              <strong>${{ totalRevenue() | number: '1.2-2' }}</strong>
+              <strong>{{ totalRevenue() }}</strong>
             </div>
           </div>
         </div>
@@ -196,20 +196,21 @@
                 <th>Customer</th>
                 <th>Due Date</th>
                 <th >Total</th>
-                <th >Balance</th>
+                <!-- <th >Balance</th> -->
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              @for (inv of invoices(); track inv.id) {
+              @for (inv of invoices() | slice:0:5; track inv.id) {
                 <tr>
                   <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
                   <td>{{ inv.customerName }}</td>
                   <td class="text-muted">{{ inv.dueDate }}</td>
-                  <td >${{ inv.totalAmount | number: '1.2-2' }}</td>
-                  <td class="font-medium" [class.text-danger]="inv.outstandingAmount > 0">
+                  <td >{{ inv.totalAmount  }}</td>
+                  <!-- | number: '1.2-2' -->
+                  <!-- <td class="font-medium" [class.text-danger]="inv.outstandingAmount > 0">
                     ${{ inv.outstandingAmount | number: '1.2-2' }}
-                  </td>
+                  </td> -->
                   <td>
                     <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
                       {{ inv.status }}
@@ -228,7 +229,7 @@
     </div>
 
     <!-- RECENT REGISTERED CUSTOMERS -->
-    <div class="card">
+    <!-- <div class="card">
       <div class="card-header">
         <div>
           <h3>Client Directory</h3>
@@ -270,7 +271,7 @@
           </tbody>
         </table>
       </div>
-    </div>
+    </div> -->
 
   <!-- </div> -->
 

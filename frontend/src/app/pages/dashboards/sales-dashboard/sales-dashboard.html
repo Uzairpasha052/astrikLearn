@@ -17,16 +17,16 @@
   <!-- STATS GRID -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon sales">📈</div>
+      <!-- <div class="stat-icon sales">📈</div> -->
       <div>
         <span class="stat-label">Total Invoiced Sales</span>
-        <h2>{{ totalSalesValue() | number: '1.2-2' }}</h2>
+        <h2>{{ totalSalesValue()  }}</h2>
         <small class="stat-sub">Across {{ totalInvoicesCount() }} Deals Closed</small>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon clients">👥</div>
+      <!-- <div class="stat-icon clients">👥</div> -->
       <div>
         <span class="stat-label">Active Client Accounts</span>
         <h2>{{ activeAccounts() }}</h2>
@@ -35,19 +35,19 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon deals">🎯</div>
+      <!-- <div class="stat-icon deals">🎯</div> -->
       <div>
         <span class="stat-label">Average Deal Size</span>
-        <h2 class="text-primary">{{ avgDealSize() | number: '1.0-0' }}</h2>
+        <h2 class="text-primary">{{ avgDealSize()  }}</h2>
         <small class="stat-sub">Average Revenue per Invoice</small>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon pending">⏳</div>
+      <!-- <div class="stat-icon pending">⏳</div> -->
       <div>
         <span class="stat-label">Pending Client Collections</span>
-        <h2 class="text-warning">{{ pendingRevenue() | number: '1.2-2' }}</h2>
+        <h2 class="text-warning">{{ pendingRevenue()  }}</h2>
         <small class="stat-sub">Awaiting Customer Settlement</small>
       </div>
     </div>
@@ -85,9 +85,10 @@
                 <tr>
                   <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
                   <td><strong>{{ inv.customerName }}</strong></td>
-                  <td class=" font-medium">${{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td class=" font-medium">{{ inv.totalAmount  }}</td>
                   <td  [class.text-danger]="inv.outstandingAmount > 0">
-                    {{ inv.outstandingAmount | number: '1.2-2' }}
+                    {{ inv.outstandingAmount  }}
+                    <!-- | number: '1.2-2' -->
                   </td>
                   <td>
                     <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">

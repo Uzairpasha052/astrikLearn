@@ -3,16 +3,22 @@ using backend.DTOs.Pagination;
 using backend.Helper;
 using backend.Interface;
 using backend.Model.Database;
+using System.Text.Json;
 
 namespace backend.Service;
 
 public class InvoiceService
 {
     private readonly IInvoiceRepository _repository;
+    private readonly CurrentUserService _currentUser;
+    private readonly AuditLogService _auditLogService;
 
-    public InvoiceService(IInvoiceRepository repository)
+    public InvoiceService(IInvoiceRepository repository, 
+        CurrentUserService currentUser, AuditLogService auditLogService)
     {
         _repository = repository;
+        _currentUser = currentUser;
+        _auditLogService = auditLogService;
     }
 
     //public async Task<List<InvoiceDisplayDto>> GetAllAsync()
@@ -94,6 +100,24 @@ public class InvoiceService
         await _repository.AddAsync(invoice);
         await _repository.SaveChangesAsync();
 
+        var newValues = JsonSerializer.Serialize(new
+        {
+            invoice.InvoiceNumber,
+            invoice.InvoiceDate,
+            invoice.DueDate,
+            invoice.Status,
+            invoice.CreatedBy
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Create",
+            "Invoice",
+            invoice.Id.ToString(),
+            null,
+            newValues
+        );
+
         var savedInvoice = await _repository.GetByIdAsync(invoice.Id);
 
         return MapToDto(savedInvoice!);
@@ -118,6 +142,15 @@ public class InvoiceService
             throw new KeyNotFoundException("Customer not found.");
 
         ValidateItems(dto.Items);
+
+        var oldValues = JsonSerializer.Serialize(new
+        {
+            invoice.InvoiceNumber,
+            invoice.InvoiceDate,
+            invoice.DueDate,
+            invoice.Status,
+            invoice.CreatedBy
+        });
 
         invoice.CustomerId = dto.CustomerId;
         invoice.InvoiceDate = dto.InvoiceDate;
@@ -154,6 +187,24 @@ public class InvoiceService
 
         var updateInvoice = await _repository.GetByIdAsync(id);
 
+        var newValues = JsonSerializer.Serialize(new
+        {
+            invoice.InvoiceNumber,
+            invoice.InvoiceDate,
+            invoice.DueDate,
+            invoice.Status,
+            invoice.CreatedBy
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Update",
+            "Invoice",
+            invoice.Id.ToString(),
+            oldValues,
+            newValues
+        );
+
         return MapToDto(updateInvoice!);
     }
 
@@ -169,12 +220,41 @@ public class InvoiceService
                 "An invoice with payment allocations cannot be deleted.");
         }
 
+        var oldValues = JsonSerializer.Serialize(new
+        {
+            invoice.InvoiceNumber,
+            invoice.InvoiceDate,
+            invoice.DueDate,
+            invoice.Status,
+            invoice.CreatedBy,
+            invoice.IsActive
+        });
+
         invoice.IsActive = false;
         invoice.IsDeleted = true;
         invoice.UpdatedAt = DateTime.UtcNow;
         invoice.UpdatedBy = userId;
 
         await _repository.SaveChangesAsync();
+
+        var newValues = JsonSerializer.Serialize(new
+        {
+            invoice.InvoiceNumber,
+            invoice.InvoiceDate,
+            invoice.DueDate,
+            invoice.Status,
+            invoice.CreatedBy,
+            invoice.IsActive
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Delete",
+            "Invoice",
+            invoice.Id.ToString(),
+            oldValues,
+            newValues
+        );
 
         return true;
     }

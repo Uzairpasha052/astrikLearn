@@ -3,6 +3,8 @@ using backend.DTOs.Pagination;
 using backend.Helper;
 using backend.Interface;
 using backend.Model.Database;
+using System.Text.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 //using backend.Repository;
 
 namespace backend.Service;
@@ -10,10 +12,15 @@ namespace backend.Service;
 public class CustomerService
 {
     private readonly ICustomerRepository _repository;
+    private readonly AuditLogService _auditLogService;
+    private readonly CurrentUserService _currentUser;
 
-    public CustomerService(ICustomerRepository repository)
+    public CustomerService(ICustomerRepository repository, AuditLogService auditLogService,
+        CurrentUserService currentUser)
     {
         _repository = repository;
+        _auditLogService = auditLogService;
+        _currentUser = currentUser;
     }
 
     public async Task<PagedResult<CustomerDto>> GetCustomersAsync(
@@ -96,22 +103,24 @@ public class CustomerService
 
         var createdCustomer = await _repository.CreateAsync(customer);
 
+        var newValues = JsonSerializer.Serialize(new
+        {
+            customer.Name,
+            customer.Email,
+            customer.Phone,
+            customer.Address,
+            customer.IsActive
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Create",
+            "Customer",
+            customer.Id.ToString(),
+            null,
+            newValues );
+
         return MapToDto(createdCustomer);
-
-        //_context.Customers.Add(customer);
-
-        //await _context.SaveChangesAsync();
-
-        //return new CustomerDto
-        //{
-        //    Id = customer.Id,
-        //    Name = customer.Name,
-        //    Email = customer.Email,
-        //    Phone = customer.Phone,
-        //    Address = customer.Address,
-        //    IsActive = customer.IsActive,
-        //    Created = customer.CreatedAt
-        //};
        
     }
 
@@ -138,6 +147,15 @@ public class CustomerService
             }
         }
 
+        var oldValues = JsonSerializer.Serialize(new
+        {
+            customer.Name,
+            customer.Email,
+            customer.Phone,
+            customer.Address,
+            customer.IsActive
+        });
+
         customer.Name = dto.Name;
         customer.Email = dto.Email;
         customer.Phone = dto.Phone;
@@ -146,13 +164,29 @@ public class CustomerService
         customer.UpdatedAt = DateTime.UtcNow;
         customer.UpdatedBy = UserId;
 
-        var updated =
-        await _repository.UpdateAsync(customer);
+        var updated = await _repository.UpdateAsync(customer);
 
         if (!updated)
         {
             return null;
         }
+
+        var newValues = JsonSerializer.Serialize(new
+        {
+            customer.Name,
+            customer.Email,
+            customer.Phone,
+            customer.Address,
+            customer.IsActive
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Update",
+            "Customer",
+            customer.Id.ToString(),
+            oldValues,
+            newValues );
 
         return MapToDto(customer);
 
@@ -167,11 +201,42 @@ public class CustomerService
             return false;
         }
 
+        var oldValues = JsonSerializer.Serialize(new
+        {
+            customer.Name,
+            customer.Email,
+            customer.Phone,
+            customer.Address,
+            customer.IsActive,
+            //customer.IsDeleted,
+        });
+
         customer.IsActive = false;
         customer.UpdatedAt = DateTime.UtcNow;
         customer.UpdatedBy = userId;
 
-        return await _repository.UpdateAsync(customer);
+        //return await _repository.UpdateAsync(customer);
+        var update = await _repository.UpdateAsync(customer);
+        
+
+        var newValues = JsonSerializer.Serialize(new
+        {
+            customer.Name,
+            customer.Email,
+            customer.Phone,
+            customer.Address,
+            customer.IsActive,
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Delete",
+            "Customer",
+            customer.Id.ToString(),
+            oldValues,
+            newValues);
+
+        return update;
     }
 
     private static CustomerDto MapToDto(Customer customer)

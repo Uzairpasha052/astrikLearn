@@ -25,6 +25,8 @@ public class PaymentRepository : IPaymentRepository
             .AsNoTracking()
             .Where(p => !p.IsDeleted)
             .Include(p => p.Customer)
+            .Include(p => p.PaymentAllocations
+                .Where(a => a.IsActive && !a.IsDeleted))
             .OrderByDescending(p => p.PaymentDate)
             .ThenByDescending(p => p.Id);
 

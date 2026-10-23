@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Helper;
 using backend.Interface;
 using backend.Repository;
 using backend.Service;
@@ -71,13 +72,18 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<ReminderService>();
+builder.Services.AddScoped<AuditLogService>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUserService>();
 
 //JWT
 var jwtkey = builder.Configuration["Jwt:Key"];

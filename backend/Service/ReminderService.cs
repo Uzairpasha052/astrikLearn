@@ -3,16 +3,22 @@ using backend.DTOs.Reminder;
 using backend.Helper;
 using backend.Interface;
 using backend.Model.Database;
+using System.Text.Json;
 
 namespace backend.Service;
 
 public class ReminderService
 {
     private readonly IReminderRepository _repository;
+    private readonly AuditLogService _auditLogService;
+    private readonly CurrentUserService _currentUser;
 
-    public ReminderService(IReminderRepository repository)
+    public ReminderService(IReminderRepository repository,
+        AuditLogService auditLogService, CurrentUserService currentUser)
     {
         _repository = repository;
+        _auditLogService = auditLogService;
+        _currentUser = currentUser;
     }
 
     public async Task<PagedResult<ReminderDisplayDto>> GetAllAsync(PaginationRequest request)
@@ -61,6 +67,25 @@ public class ReminderService
         await _repository.CreateAsync(reminder);
         await _repository.SaveChanges();
 
+        var newValues = JsonSerializer.Serialize(new
+        {
+            reminder.Id,
+            reminder.InvoiceId,
+            reminder.ReminderType,
+            reminder.ReminderDate,
+            reminder.CreatedAt,
+            reminder.CreatedBy
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Create",
+            "Reminder",
+            reminder.Id.ToString(),
+            null,
+            newValues
+        );
+
         var created = await _repository.GetByIdAsync(reminder.Id);
 
         if (created == null)
@@ -88,6 +113,16 @@ public class ReminderService
         //        "Only pending reminders can be updated.");
         //}
 
+        var oldValues = JsonSerializer.Serialize(new
+        {
+            existing.Id,
+            existing.InvoiceId,
+            existing.ReminderType,
+            existing.ReminderDate,
+            existing.UpdatedAt,
+            existing.UpdatedBy
+        });
+
         existing.ReminderDate = dto.ReminderDate;
         existing.ReminderType = dto.ReminderType.Trim();
         existing.Message = dto.Message?.Trim();
@@ -96,6 +131,25 @@ public class ReminderService
 
         await _repository.SaveChanges();
         var updated = await _repository.GetByIdAsync(id);
+
+        var newValues = JsonSerializer.Serialize(new
+        {
+            existing.Id,
+            existing.InvoiceId,
+            existing.ReminderType,
+            existing.ReminderDate,
+            existing.UpdatedAt,
+            existing.UpdatedBy
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Update",
+            "Reminder",
+            existing.Id.ToString(),
+            oldValues,
+            newValues
+        );
 
         return updated == null ? null : MapToDto(updated);
     }
@@ -107,12 +161,39 @@ public class ReminderService
         if (existing == null)
             return false;
 
+        var oldValues = JsonSerializer.Serialize(new
+        {
+            existing.Id,
+            existing.InvoiceId,
+            existing.ReminderType,
+            existing.ReminderDate,
+            existing.IsActive
+        });
+
         existing.IsDeleted = true;
         existing.IsActive = false;
         existing.UpdatedAt = DateTime.UtcNow;
         existing.UpdatedBy = userId;
 
         await _repository.SaveChanges();
+
+        var newValues = JsonSerializer.Serialize(new
+        {
+            existing.Id,
+            existing.InvoiceId,
+            existing.ReminderType,
+            existing.ReminderDate,
+            existing.IsActive
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Delete",
+            "Reminder",
+            existing.Id.ToString(),
+            oldValues,
+            newValues
+        );
 
         return true;
     }

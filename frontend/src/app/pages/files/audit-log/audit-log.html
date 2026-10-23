@@ -1,0 +1,318 @@
+<div class="audit-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <!-- <div class="badge-tag">SECURITY & SYSTEM COMPLIANCE</div> -->
+      <h1>System Audit Trail</h1>
+      <p>Immutable log of create, update, and delete actions records.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="loadLogs(currentPage())" [disabled]="loading()">
+        <span class="btn-icon">↻</span> Refresh Logs
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card total">
+      <!-- <div class="kpi-icon">📜</div> -->
+      <div class="kpi-content">
+        <span>Total Audit Events</span>
+        <h2>{{ totalCount() }}</h2>
+        <!-- <small>System operations logged</small> -->
+      </div>
+    </div>
+
+    <div class="kpi-card creates">
+      <!-- <div class="kpi-icon">➕</div> -->
+      <div class="kpi-content">
+        <span>Record Creations</span>
+        <h2>{{ createCount() }}</h2>
+        <!-- <small class="text-success">New entries inserted</small> -->
+      </div>
+    </div>
+
+    <div class="kpi-card updates">
+      <!-- <div class="kpi-icon">✏️</div> -->
+      <div class="kpi-content">
+        <span>Modifications / Updates</span>
+        <h2>{{ updateCount() }}</h2>
+        <!-- <small class="text-warning">State & value alterations</small> -->
+      </div>
+    </div>
+
+    <div class="kpi-card deletes">
+      <!-- <div class="kpi-icon">🗑️</div> -->
+      <div class="kpi-content">
+        <span>Deletions & Purges</span>
+        <h2>{{ deleteCount() }}</h2>
+        <!-- <small class="text-danger">Soft-deletes & removals</small> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS & CONTROLS -->
+  <div class="filters-card">
+    <div class="search-box">
+      <span class="search-icon"></span>
+      <!-- 🔍 -->
+      <input
+        type="text"
+        placeholder="Search by user, entity name, entity ID, or action..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      />
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-item">
+        <label>Action:</label>
+        <select [ngModel]="selectedAction()" (ngModelChange)="selectedAction.set($event)">
+          <option value="ALL">All Actions</option>
+          <option value="CREATE">CREATE</option>
+          <option value="UPDATE">UPDATE</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Entity:</label>
+        <select [ngModel]="selectedEntity()" (ngModelChange)="selectedEntity.set($event)">
+          <option value="ALL">All Entities</option>
+          <option value="Invoice">Invoice</option>
+          <option value="Customer">Customer</option>
+          <option value="Payment">Payment</option>
+          <option value="PaymentAllocation">PaymentAllocation</option>
+          <option value="Reminder">Reminder</option>
+          <option value="User">User</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIT LOG TABLE CARD -->
+  <div class="table-card">
+    <div class="table-header-info">
+      <h3>Audit Activity Log</h3>
+      <span class="count-tag">{{ filteredLogs().length }} Events Shown</span>
+    </div>
+
+    <div class="table-responsive">
+      @if (loading()) {
+        <div class="loader-state">
+          <div class="spinner"></div>
+          <p>Retrieving audit trail records...</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <!-- <th style="width: 80px;">Log ID</th> -->
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Target Entity</th>
+              <th>Entity ID</th>
+              <th>Performed By</th>
+              <th>Changes Summary</th>
+              <th class="text-right">Inspection</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of filteredLogs(); track log.id) {
+              <tr>
+                <!-- <td class="font-mono text-muted">#{{ log.id }}</td> -->
+                <td class="text-muted text-sm whitespace-nowrap">
+                  {{ log.timestamp | date: 'dd MMM yyyy, HH:mm:ss' }}
+                </td>
+                <td>
+                  <span class="action-badge" [class]="getActionClass(log.action)">
+                    {{ log.action }}
+                  </span>
+                </td>
+                <td>
+                  <span class="entity-pill">{{ log.entityName }}</span>
+                </td>
+                <td class="font-mono font-medium">
+                  {{ log.entityId ? log.entityId : '-' }}
+                </td>
+                <td>
+                  <div class="user-cell">
+                    <!-- <span class="avatar-small">{{ log.userName?.charAt(0) || 'U' }}</span> -->
+                    <div>
+                      <strong>{{ log.userName || 'System / Auto' }}</strong>
+                      <!-- @if (log.userId) {
+                        <small class="user-sub">User ID #{{ log.userId }}</small>
+                      } -->
+                    </div>
+                  </div>
+                </td>
+                <td class="preview-cell">
+                  @if (log.oldValues || log.newValues) {
+                    <span class="preview-text">
+                      @if (log.oldValues && log.newValues) {
+                        State modified <!-- (before & after captured)-->
+                      } @else if (log.newValues) {
+                        New record <!-- payload captured -->
+                      } @else {
+                        Pre-deletion snapshot captured
+                      }
+                    </span>
+                  } @else {
+                    <span class="text-muted text-sm">No payload recorded</span>
+                  }
+                </td>
+                <td class="text-right">
+                  <button class="btn btn-sm btn-outline" (click)="openDetail(log)" title="Inspect Audit Diff">
+                    Details
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-state">
+                  <div class="empty-box">
+                    <!-- <span class="empty-icon">🛡️</span> -->
+                    <h4>No audit logs found</h4>
+                    <p>There are no audit records matching your current filter criteria.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-footer">
+      <span class="text-muted">
+        Showing Page {{ currentPage() }} of {{ totalPages() || 1 }} ({{ totalCount() }} total records)
+      </span>
+
+      <div class="pagination-btns">
+        <button
+          class="btn-page"
+          [disabled]="currentPage() <= 1 || loading()"
+          (click)="goToPage(currentPage() - 1)"
+        >
+          Previous
+        </button>
+        <button class="btn-page active">{{ currentPage() }}</button>
+        <button
+          class="btn-page"
+          [disabled]="currentPage() >= totalPages() || loading()"
+          (click)="goToPage(currentPage() + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DIFF & PAYLOAD INSPECTION -->
+  @if (showDetailModal() && selectedLog()) {
+    <div class="modal-backdrop" (click)="closeDetail()">
+      <div class="modal-window modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="badge-tag">AUDIT EVENT </div>
+            <h2>Audit Log {{ selectedLog()!.id }} Details</h2>
+            <!-- <p class="modal-sub">
+              {{ selectedLog()!.action }} on {{ selectedLog()!.entityName }}
+              @if (selectedLog()!.entityId) {
+                (#{{ selectedLog()!.entityId }})
+              }
+              by {{ selectedLog()!.userName || 'System' }}
+            </p> -->
+          </div>
+          <button class="btn-close" (click)="closeDetail()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- EVENT METADATA STRIP -->
+          <div class="meta-strip">
+            <div class="meta-item">
+              <span class="meta-lbl">ACTION</span>
+              <span class="action-badge" [class]="getActionClass(selectedLog()!.action)">
+                {{ selectedLog()!.action }}
+              </span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-lbl">TARGET ENTITY</span>
+              <strong>{{ selectedLog()!.entityName }}</strong>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-lbl">RECORD ID</span>
+              <strong class="font-mono">{{ selectedLog()!.entityId || 'N/A' }}</strong>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-lbl">PERFORMED BY</span>
+              <strong>{{ selectedLog()!.userName || 'System / Batch' }}</strong>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-lbl">TIMESTAMP</span>
+              <span>{{ selectedLog()!.timestamp | date: 'medium' }}</span>
+            </div>
+          </div>
+
+          <!-- DIFF COMPARISON SECTION -->
+          <div class="diff-container">
+            <!-- OLD VALUES COLUMN -->
+            <div class="diff-column">
+              <div class="column-header old">
+                <!-- <span class="header-icon">◀</span> -->
+                <div>
+                  <h4>Old Values</h4>
+                  <!-- <small>Recorded before modification</small> -->
+                </div>
+              </div>
+
+              @if (selectedLog()!.oldValues) {
+                <div class="code-box">
+                  <pre><code>{{ formatJson(selectedLog()!.oldValues) }}</code></pre>
+                </div>
+              } @else {
+                <div class="empty-diff">
+                  <span>No prior state</span>
+                </div>
+              }
+            </div>
+
+            <!-- NEW VALUES COLUMN -->
+            <div class="diff-column">
+              <div class="column-header new">
+                <!-- <span class="header-icon">▶</span> -->
+                <div>
+                  <h4>New Values</h4>
+                  <!-- <small>Recorded after modification</small> -->
+                </div>
+              </div>
+
+              @if (selectedLog()!.newValues) {
+                <div class="code-box">
+                  <pre><code>{{ formatJson(selectedLog()!.newValues) }}</code></pre>
+                </div>
+              } @else {
+                <div class="empty-diff">
+                  <span>No new state (Record Deleted)</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDetail()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

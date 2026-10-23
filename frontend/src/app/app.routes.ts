@@ -15,6 +15,7 @@ import { Invoice } from './pages/files/invoice/invoice';
 import { Payment } from './pages/files/payment/payment';
 import { Reminder } from './pages/files/reminder/reminder';
 import { Intelligence } from './pages/files/intelligence/intelligence';
+import { AuditLogComponent } from './pages/files/audit-log/audit-log';
 
 export const routes: Routes = [
   {
@@ -102,6 +103,20 @@ export const routes: Routes = [
       }
     ]
   },
+  {
+    path: 'audit-logs',
+    component: DashboardLayout,
+    canActivate: [authGuard, roleGuard],
+    data: {
+      roles: ['Admin']
+    },
+    children: [
+      {
+        path: '',
+        component: AuditLogComponent
+      }
+    ]
+  },
 
   // Admin Protected Routes
   {
@@ -123,6 +138,10 @@ export const routes: Routes = [
       {
         path: 'users',
         component: User
+      },
+      {
+        path: 'audit-logs',
+        component: AuditLogComponent
       }
     ]
   },

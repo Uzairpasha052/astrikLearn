@@ -74,7 +74,7 @@
         routerLinkActive="active"
         class="nav-item nav-ai"
       >
-        <span class="nav-icon">✦</span>
+        <span class="nav-icon">AI</span>
         <span class="nav-text">AI Risk Intelligence</span>
       </a>
 
@@ -101,6 +101,15 @@
           <!-- ➕ -->
           <span class="nav-text">Register User</span>
         </a>
+
+        <a
+          routerLink="/admin/audit-logs"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="nav-icon">L</span>
+          <span class="nav-text">Audit Logs</span>
+        </a>
       }
     </nav>
 
@@ -117,8 +126,8 @@
       </div> -->
 
       <button class="logout-btn" (click)="logout()" title="Sign out of system">
-        <span class="nav-icon">🚪</span>
-        <span class="nav-text">Sign Out</span>
+        <!-- <span class="nav-icon"></span> -->
+        <span class="nav-text-logout">Sign Out</span>
       </button>
     </div>
 

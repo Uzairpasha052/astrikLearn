@@ -9,46 +9,47 @@
     </div>
 
     <div class="header-actions">
-      <a routerLink="/invoices" class="btn btn-primary">+ Create Invoice</a>
-      <a routerLink="/payments" class="btn btn-secondary">+ Record Payment</a>
-      <a routerLink="/reminders" class="btn btn-outline">🔔 Reminders</a>
+      <!-- <a routerLink="/invoices" class="btn btn-primary">+ Create Invoice</a> -->
+      <a routerLink="/payments" class="btn btn-primary"> Record Payment</a>
+      <a routerLink="/reminders" class="btn btn-outline"> Reminders</a>
     </div>
   </div>
 
   <!-- STATS GRID -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon revenue">💵</div>
+      <!-- <div class="stat-icon revenue">💵</div> -->
       <div>
         <span class="stat-label">Total Invoiced</span>
-        <h2>{{ totalInvoiced() | number: '1.2-2' }}</h2>
+        <h2>{{ totalInvoiced()  }}</h2>
+         <!-- | number: '1.2-2' -->
         <small class="stat-sub">Gross Billed Portfolio</small>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon collections">✓</div>
+      <!-- <div class="stat-icon collections">✓</div> -->
       <div>
         <span class="stat-label">Collected Collections</span>
-        <h2 class="text-success">{{ totalCollected() | number: '1.2-2' }}</h2>
+        <h2 class="text-success">{{ totalCollected() }}</h2>
         <small class="stat-sub text-success">{{ recoveryRate() }}% Settled</small>
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon receivables">⚠️</div>
+      <!-- <div class="stat-icon receivables">⚠️</div> -->
       <div>
         <span class="stat-label">Unpaid Receivables</span>
-        <h2 class="text-danger">{{ totalOutstanding() | number: '1.2-2' }}</h2>
+        <h2 class="text-danger">{{ totalOutstanding()  }}</h2>
          <small class="stat-sub text-danger"> <!-- {{ overdueInvoices() }} --> Overdue</small> 
       </div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-icon treasury">🏦</div>
+      <!-- <div class="stat-icon treasury">🏦</div> -->
       <div>
         <span class="stat-label">Unallocated Cash</span>
-        <h2 class="text-warning">{{ unallocatedCash() | number: '1.2-2' }}</h2>
+        <h2 class="text-warning">{{ unallocatedCash()  }}</h2>
         <small class="stat-sub">Pending Allocation to Invoices</small>
       </div>
     </div>

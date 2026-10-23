@@ -91,6 +91,7 @@ export class Payment implements OnInit {
     this.loading.set(true);
     this.paymentService.getPayments(page, this.pageSize()).subscribe({
       next: (res) => {
+        console.log(res)
         this.payments.set(res.items);
         this.currentPage.set(res.pageNumber);
         this.totalCount.set(res.totalCount);

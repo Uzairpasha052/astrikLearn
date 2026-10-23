@@ -3,26 +3,30 @@ using backend.DTOs.PaymentDTOs;
 using backend.Helper;
 using backend.Interface;
 using backend.Model.Database;
+using System.Text.Json;
 
 namespace backend.Service;
 
 public class PaymentService
 {
     private readonly IPaymentRepository _repository;
+    private readonly AuditLogService _auditLogService;
+    private readonly CurrentUserService _currentUser;
 
-    public PaymentService(IPaymentRepository repository)
+    public PaymentService(IPaymentRepository repository, 
+        AuditLogService auditLogService, CurrentUserService currentUser)
     {
         _repository = repository;
+        _auditLogService = auditLogService;
+        _currentUser = currentUser;
     }
 
     public async Task<PagedResult<PaymentDisplayDto>> GetAllAsync(PaginationRequest request)
     {
         var payments = await _repository.GetAllAsync(request);
 
-
         return new PagedResult<PaymentDisplayDto>
         {
-          
             Items = payments.Items.Select(MapToDto).ToList(),
             TotalCount = payments.TotalCount,
             PageNumber = payments.PageNumber,
@@ -42,7 +46,7 @@ public class PaymentService
 
     public async Task<PaymentDisplayDto> CreateAsync(
         CreatePaymentDto dto,
-        int? userId)
+        int? userId )
     {
         if (dto.Amount <= 0)
             throw new ArgumentException(
@@ -68,8 +72,24 @@ public class PaymentService
         await _repository.AddAsync(payment);
         await _repository.SaveChangesAsync();
 
-        var savedPayment = await _repository.GetByIdAsync(payment.Id);
+        var newValues = JsonSerializer.Serialize(new
+        {
+            payment.Id,
+            payment.PaymentMethod,
+            payment.CreatedAt,
+            payment.CreatedBy
+        });
 
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Create",
+            "Payment",
+            payment.Id.ToString(),
+            null,
+            newValues
+        );
+
+        var savedPayment = await _repository.GetByIdAsync(payment.Id);
         return MapToDto(savedPayment!);
     }
 
@@ -166,6 +186,37 @@ public class PaymentService
         }
 
         await _repository.AddAllocationsAsync(newAllocations);
+
+        //var oldValues = JsonSerializer.Serialize(new
+        //{
+        //    PaymentId = payment.Id,
+        //    PreviouslyAllocatedAmount = alreadyAllocated,
+        //    PreviouslyUnallocatedAmount = payment.Amount - alreadyAllocated
+        //});
+
+        var newValues = JsonSerializer.Serialize(new
+        {
+            PaymentId = payment.Id,
+            Allocations = newAllocations.Select(a => new
+            {
+                //a.Id,
+                a.InvoiceId,
+                a.AllocatedAmount
+            }).ToList(),
+            TotalAllocatedAmount = alreadyAllocated + requestedTotal,
+            RemainingUnallocatedAmount =
+                payment.Amount - (alreadyAllocated + requestedTotal)
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId ?? userId,
+            "Create",
+            "PaymentAllocation",
+            payment.Id.ToString(),
+            null,
+            newValues);
+
+
         await _repository.SaveChangesAsync();
 
         return newAllocations.Select(a =>

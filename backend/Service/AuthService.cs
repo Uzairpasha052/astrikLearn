@@ -4,6 +4,7 @@ using backend.Helper;
 using backend.Interface;
 using backend.Model;
 using backend.Repository;
+using System.Text.Json;
 
 namespace backend.Service;
 
@@ -11,11 +12,16 @@ public class AuthService
 {
     private readonly IUserRepository _context;
     private readonly ITokenService _tokenService;
+    private readonly AuditLogService _auditLogService;
+    private readonly CurrentUserService _currentUser;
 
-    public AuthService(IUserRepository context, ITokenService tokenService)
+    public AuthService(IUserRepository context, ITokenService tokenService,
+        AuditLogService auditLogService, CurrentUserService currentUser)
     {
         _context = context;
         _tokenService = tokenService;
+        _auditLogService = auditLogService;
+        _currentUser = currentUser;
     }
 
     public async Task<UserDisplayDto?> RegisterAsync(RegisterDto dto)
@@ -40,6 +46,23 @@ public class AuthService
 
         var createdUser = await _context.CreateAsync(user);
 
+        var newValues = JsonSerializer.Serialize(new
+        {
+            createdUser.Id,
+            createdUser.Name,
+            Email = createdUser.Mail,
+            Role = createdUser.Role.Name,
+        });
+
+        await _auditLogService.LogAsync(
+            _currentUser.UserId,
+            "Register",
+            "User",
+            createdUser.Id.ToString(),
+            null,
+            newValues
+            );
+
         return new UserDisplayDto
         {
             Id = createdUser.Id,
@@ -47,13 +70,8 @@ public class AuthService
             Email = createdUser.Mail,
             Role = createdUser.Role.Name ?? string.Empty,
             Date = createdUser.CreatedAt
-            //Token = _tokenService.GenerateToken(createdUser)
         };
 
-        //_context.Users.Add(user);
-        //await _context.SaveChangesAsync();
-
-        //return user;
     }
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
@@ -75,6 +93,24 @@ public class AuthService
         {
             return null;
         }
+
+        var newValues = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            existingUser.Id,
+            existingUser.Name,
+            Email = existingUser.Mail,
+            Role = existingUser.Role.Name
+        });
+
+        await _auditLogService.LogAsync(
+            //_currentUser.UserId,
+            existingUser.Id,
+            "Login",
+            "User",
+            existingUser.Id.ToString(),
+            null,
+            newValues
+            );
 
         return new AuthResponseDto
         {

@@ -105,13 +105,13 @@
                   </span>
                 </td>
                 <td class="text-right font-medium">
-                  {{ inv.totalAmount | number: '1.2-2' }}
+                  {{ inv.totalAmount  }}
                 </td>
                 <td class="text-right text-success font-medium">
-                  {{ inv.amountPaid | number: '1.2-2' }}
+                  {{ inv.amountPaid  }}
                 </td>
                 <td class="text-right font-bold" [class.text-danger]="inv.outstandingAmount > 0">
-                  {{ inv.outstandingAmount | number: '1.2-2' }}
+                  {{ inv.outstandingAmount  }}
                 </td>
                 <td>
                   <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
@@ -122,9 +122,9 @@
                   <button
                     class="btn-icon-ai"
                     title="Assess AI Risk"
-                    (click)="assessRisk(inv)"
+                    /* (click)="assessRisk(inv)" */
                   >
-                    ✦ Risk
+                    Risk
                   </button>
                 </td>
                 <td class="text-right">
@@ -159,7 +159,7 @@
               <tr>
                 <td colspan="11" class="empty-state">
                   <div class="empty-box">
-                    <span class="empty-icon">📄</span>
+                    <!-- <span class="empty-icon">📄</span> -->
                     <h4>No invoices found</h4>
                     <p>No invoices matched your filter criteria or none have been issued yet.</p>
                     @if (canCreate) {

@@ -28,6 +28,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Role> Roles { get; set; }
 
+    public DbSet<AuditLog> AuditLogs { get; set; }
+
     //protected override void OnModelCreating(ModelBuilder modelBuilder)
     //{
     //    base.OnModelCreating(modelBuilder);
@@ -41,6 +43,37 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // =====================================================
+        // Audit Log
+        // =====================================================
+
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.ToTable("AuditLogs");
+
+            entity.HasKey(a => a.Id);
+
+            entity.Property(a => a.Action)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(a => a.EntityName)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(a => a.EntityId)
+                .HasMaxLength(100);
+
+            entity.Property(a => a.Timestamp)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
 
         // =====================================================
         // Role
