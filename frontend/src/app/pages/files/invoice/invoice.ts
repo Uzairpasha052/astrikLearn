@@ -28,6 +28,9 @@ export class Invoice implements OnInit {
   // Role permissions
   canCreate = this.authService.hasRole('Admin', 'Sales');
   canEditDelete = this.authService.hasRole('Admin');
+  get isAdmin(): boolean {
+    return this.authService.hasRole('Admin');
+  }
 
   // State signals
   invoices = signal<InvoiceDisplayDto[]>([]);
@@ -126,6 +129,19 @@ export class Invoice implements OnInit {
 
     return list;
   });
+
+  // Readonly financial totals for Admin
+  totalInvoicesAmount = computed(() =>
+    this.filteredInvoices().reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0)
+  );
+
+  totalPaidAmount = computed(() =>
+    this.filteredInvoices().reduce((sum, inv) => sum + (Number(inv.amountPaid) || 0), 0)
+  );
+
+  totalOutstandingAmount = computed(() =>
+    this.filteredInvoices().reduce((sum, inv) => sum + (Number(inv.outstandingAmount) || 0), 0)
+  );
 
   // Calculate Aging Bucket
   getAgingBucket(inv: InvoiceDisplayDto): string {

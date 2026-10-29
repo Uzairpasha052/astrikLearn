@@ -44,7 +44,8 @@ export class Customer implements OnInit {
     name: ['', [Validators.required, Validators.maxLength(100)]],
     email: ['', [Validators.email, Validators.maxLength(100)]],
     phone: ['', [Validators.maxLength(20)]],
-    address: ['', [Validators.maxLength(200)]]
+    address: ['', [Validators.maxLength(200)]],
+    isActive: [true]
   });
 
   ngOnInit(): void {
@@ -106,7 +107,8 @@ export class Customer implements OnInit {
       name: c.name,
       email: c.email || '',
       phone: c.phone || '',
-      address: c.address || ''
+      address: c.address || '',
+      isActive: c.isActive ?? true
     });
     this.showModal.set(true);
   }
@@ -134,7 +136,8 @@ export class Customer implements OnInit {
       name: formVal.name!.trim(),
       email: formVal.email?.trim() || undefined,
       phone: formVal.phone?.trim() || undefined,
-      address: formVal.address?.trim() || undefined
+      address: formVal.address?.trim() || undefined,
+      isActive: formVal.isActive ?? true  
     };
 
     const action$ =

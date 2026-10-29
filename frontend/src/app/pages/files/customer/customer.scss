@@ -351,6 +351,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+
+  scrollbar-width: none;
 }
 
 .modal-sm {
@@ -413,6 +415,10 @@
   flex-wrap: wrap;
 }
 
+.form-groups{
+  margin-bottom: 6px;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -426,6 +432,12 @@
 }
 
 .form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-groups label {
   font-size: 13px;
   font-weight: 600;
   color: #334155;

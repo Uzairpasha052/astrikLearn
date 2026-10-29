@@ -16,10 +16,10 @@ public class CustomerRepository : ICustomerRepository
         _context = context;
     }
 
-    //public async Task<List<Customer>> GetAllAsync()
-    //{
-    //    return await _context.Customers.ToListAsync();
-    //}
+    public async Task<List<Customer>> GetAllAsync()
+    {
+        return await _context.Customers.ToListAsync();
+    }
 
     public async Task<Customer?> GetByIdAsync(int id)
     {

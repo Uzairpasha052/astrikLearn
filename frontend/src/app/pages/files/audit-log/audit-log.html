@@ -75,6 +75,8 @@
           <option value="CREATE">CREATE</option>
           <option value="UPDATE">UPDATE</option>
           <option value="DELETE">DELETE</option>
+          <option value="LOGIN">LOGIN</option>
+          <option value="REGISTER">REGISTER</option>
         </select>
       </div>
 
@@ -157,7 +159,8 @@
                       } @else if (log.newValues) {
                         New record <!-- payload captured -->
                       } @else {
-                        Pre-deletion snapshot captured
+                        <!-- Pre-deletion snapshot captured -->
+                         State Deleted
                       }
                     </span>
                   } @else {

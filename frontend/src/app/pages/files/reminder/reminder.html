@@ -87,7 +87,9 @@
                     {{ r.reminderType }}
                   </span>
                 </td>
-                <td class="message-cell text-muted">
+                <td class="message-cell text-muted message-preview"
+                  [title]="r.message || 'Standard follow-up memo'"
+                >
                   {{ r.message || 'Standard follow-up memo' }}
                 </td>
                 <!-- <td>
@@ -99,10 +101,10 @@
                   <div class="action-buttons">
                     @if (canManage) {
                       <button class="btn-sm btn-outline" (click)="openEditModal(r)" title="Edit Reminder">
-                        ✏
+                        <!-- ✏ --> Edit
                       </button>
                       <button class="btn-sm btn-danger-outline" (click)="confirmDelete(r)" title="Cancel / Remove">
-                        🗑
+                        <!-- 🗑 --> Del
                       </button>
                     }
                   </div>

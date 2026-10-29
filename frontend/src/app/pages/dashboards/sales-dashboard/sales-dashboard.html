@@ -16,48 +16,43 @@
 
   <!-- STATS GRID -->
   <div class="stats-grid">
-    <div class="stat-card">
-      <!-- <div class="stat-icon sales">📈</div> -->
-      <div>
-        <span class="stat-label">Total Invoiced Sales</span>
-        <h2>{{ totalSalesValue()  }}</h2>
-        <small class="stat-sub">Across {{ totalInvoicesCount() }} Deals Closed</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon clients">👥</div> -->
-      <div>
-        <span class="stat-label">Active Client Accounts</span>
-        <h2>{{ activeAccounts() }}</h2>
-        <small class="stat-sub">Accounts in Portfolio</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon deals">🎯</div> -->
-      <div>
-        <span class="stat-label">Average Deal Size</span>
-        <h2 class="text-primary">{{ avgDealSize()  }}</h2>
-        <small class="stat-sub">Average Revenue per Invoice</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon pending">⏳</div> -->
-      <div>
-        <span class="stat-label">Pending Client Collections</span>
-        <h2 class="text-warning">{{ pendingRevenue()  }}</h2>
-        <small class="stat-sub">Awaiting Customer Settlement</small>
-      </div>
-    </div>
+    <app-stat-card
+      title="Total Reminders"
+      [value]="totalReminder()"
+      subtitle="Created by only Admin"
+      icon=""
+      iconClass="reminders"
+    />
+    <app-stat-card
+      title="Active Client Accounts"
+      [value]="activeAccounts()"
+      [subtitle]="'Across ' + totalInvoicesCount() + ' Deals Closed'"
+      icon=""
+      iconClass="clients"
+    />
+    <app-stat-card
+      title="Average Deal Size"
+      [value]="avgDealSize() | number: '1.0-0'"
+      subtitle="Average Revenue per Invoice"
+      valueClass="text-primary"
+      icon=""
+      iconClass="deals"
+    />
+    <app-stat-card
+      title="Pending Client Collections"
+      [value]="pendingRevenue() | number: '1.0-0'"
+      subtitle="Awaiting Customer Settlement"
+      valueClass="text-warning"
+      icon=""
+      iconClass="pending"
+    />
   </div>
 
   <!-- MAIN GRID -->
   <!-- <div class="content-grid"> -->
 
     <!-- RECENT SALES INVOICES -->
-    <div class="card">
+    <!-- <div class="card">
       <div class="card-header">
         <div>
           <h3>Recent Client Invoices</h3>
@@ -88,7 +83,7 @@
                   <td class=" font-medium">{{ inv.totalAmount  }}</td>
                   <td  [class.text-danger]="inv.outstandingAmount > 0">
                     {{ inv.outstandingAmount  }}
-                    <!-- | number: '1.2-2' -->
+                    <!-- | number: '1.2-2' 
                   </td>
                   <td>
                     <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
@@ -105,7 +100,7 @@
           </table>
         }
       </div>
-    </div>
+    </div> -->
 
     <!-- CLIENT DIRECTORY -->
     <div class="card">

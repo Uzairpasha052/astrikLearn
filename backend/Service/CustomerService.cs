@@ -35,9 +35,9 @@ public class CustomerService
             {
                 Id = c.Id,
                 Name = c.Name,
-                Email = c.Email,
-                Phone = c.Phone,
-                Address = c.Address,
+                Email = c.Email!,
+                Phone = c.Phone!,
+                Address = c.Address!,
                 IsActive = c.IsActive,
                 Created = c.CreatedAt
             })
@@ -160,6 +160,7 @@ public class CustomerService
         customer.Email = dto.Email;
         customer.Phone = dto.Phone;
         customer.Address = dto.Address;
+        customer.IsActive = dto.IsActive;
 
         customer.UpdatedAt = DateTime.UtcNow;
         customer.UpdatedBy = UserId;
@@ -245,9 +246,9 @@ public class CustomerService
         {
             Id = customer.Id,
             Name = customer.Name,
-            Email = customer.Email,
-            Phone = customer.Phone,
-            Address = customer.Address,
+            Email = customer.Email!,
+            Phone = customer.Phone!,
+            Address = customer.Address!,
             IsActive = customer.IsActive,
             Created = customer.CreatedAt
         };

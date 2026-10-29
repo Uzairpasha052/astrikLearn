@@ -14,6 +14,7 @@ export interface CreateCustomerDto {
   email?: string;
   phone?: string;
   address?: string;
+  isActive: boolean
 }
 
 export type UpdateCustomerDto = CreateCustomerDto;

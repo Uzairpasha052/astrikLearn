@@ -135,6 +135,22 @@
   gap: 4px;
 }
 
+.aging-box.period-2d {
+  border-left: 4px solid #06b6d4;
+}
+
+.aging-box.period-1w {
+  border-left: 4px solid #0d9488;
+}
+
+.aging-box.period-1m {
+  border-left: 4px solid #10b981;
+}
+
+.aging-box.period-6m {
+  border-left: 4px solid #6366f1;
+}
+
 .aging-box.current {
   border-left: 4px solid #10b981;
 }

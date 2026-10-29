@@ -1,6 +1,6 @@
 using backend.DTOs;
-using backend.DTOs.Pagination;
-using backend.Model;
+//using backend.DTOs.Pagination;
+//using backend.Model;
 using backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,13 +52,13 @@ public class AuthController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet("users")]
-    public async Task<IActionResult> UserDisplay([FromQuery] PaginationRequest request)
-    {
-        var user = await _service.UserDisplayAsync(request);
+    //[Authorize(Roles = "Admin")]
+    //[HttpGet("users")]
+    //public async Task<IActionResult> UserDisplay([FromQuery] PaginationRequest request)
+    //{
+    //    var user = await _service.UserDisplayAsync(request);
 
-        return Ok(user);
-    }
+    //    return Ok(user);
+    //}
 
 }

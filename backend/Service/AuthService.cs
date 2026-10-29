@@ -3,7 +3,7 @@ using backend.DTOs.Pagination;
 using backend.Helper;
 using backend.Interface;
 using backend.Model;
-using backend.Repository;
+//using backend.Repository;
 using System.Text.Json;
 
 namespace backend.Service;
@@ -120,8 +120,6 @@ public class AuthService
             Role = existingUser.Role.Name ?? string.Empty,
             Token = _tokenService.GenerateToken(existingUser)
         };
-        //return existingUser;
-
     }
 
     //public async Task<List<UserDisplayDto>> UserDisplayAsync()
@@ -140,26 +138,26 @@ public class AuthService
     //}
 
 
-    public async Task<PagedResult<UserDisplayDto>> UserDisplayAsync(
-        PaginationRequest request)
-    {
-        var result = await _context.GetPageAsync(request);
+    //public async Task<PagedResult<UserDisplayDto>> UserDisplayAsync(
+    //    PaginationRequest request)
+    //{
+    //    var result = await _context.GetPageAsync(request);
 
-        return new PagedResult<UserDisplayDto>
-        {
-            Items = result.Items.Select(u => new UserDisplayDto
-            {
-                Id = u.Id,
-                Name = u.Name,
-                Email = u.Mail,
-                Role = u.Role.Name ?? string.Empty,
-                Date = u.CreatedAt
-            }).ToList(),
+    //    return new PagedResult<UserDisplayDto>
+    //    {
+    //        Items = result.Items.Select(u => new UserDisplayDto
+    //        {
+    //            Id = u.Id,
+    //            Name = u.Name,
+    //            Email = u.Mail,
+    //            Role = u.Role.Name ?? string.Empty,
+    //            Date = u.CreatedAt
+    //        }).ToList(),
 
-            TotalCount = result.TotalCount,
-            PageNumber = result.PageNumber,
-            PageSize = result.PageSize
-        };
-    }
+    //        TotalCount = result.TotalCount,
+    //        PageNumber = result.PageNumber,
+    //        PageSize = result.PageSize
+    //    };
+    //}
 
 }

@@ -65,6 +65,7 @@ export class Register {
       .subscribe({
         next: (response) => {
           console.log( response);
+          this.resetForm()
 
           this.toast.success( 
             'Registration successful:',
@@ -73,8 +74,6 @@ export class Register {
               timeOut: 4000,
             }
           )
-
-          this.resetForm()
         },
 
         error: (error) => {

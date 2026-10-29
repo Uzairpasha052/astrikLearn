@@ -23,99 +23,219 @@
 
   <!-- STATS CARDS GRID -->
   <div class="stats-grid">
-    <div class="stat-card">
-      <!-- <div class="stat-icon revenue">💰</div> -->
-      <div class="stat-body">
-        <span class="stat-title">Total Invoiced</span>
-        <h2>{{ totalRevenue() }}</h2>
-        <small class="stat-sub">{{ totalInvoicesCount() }} Total Invoices Issued</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon collected">✓</div> -->
-      <div class="stat-body">
-        <span class="stat-title">Total Collected</span>
-        <h2 class="text-success">{{ totalCollected()  }}</h2>
-        <small class="stat-sub text-success">{{ collectionRate() }}% Collection Efficiency</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon outstanding">⚠️</div> -->
-      <div class="stat-body">
-        <span class="stat-title">Open Receivables</span>
-        <h2 class="text-danger">{{ totalOutstanding()  }}</h2>
-         <small class="stat-sub text-danger"> <!--{{ overdueCount() }} --> Overdue</small> 
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon clients">👥</div> -->
-      <div class="stat-body">
-        <span class="stat-title">Customer Acc</span>
-        <h2>{{ totalCustomers() }}</h2>
-        <small class="stat-sub">{{ totalUsers() }} System Users Active</small>
-      </div>
-    </div>
+    <app-stat-card
+      title="Total Invoiced"
+      [value]="totalRevenue() | number: '1.0-0'"
+      [subtitle]="totalInvoicesCount() + ' Total Invoices Issued'"
+      icon=""
+      iconClass="revenue"
+    />
+    <app-stat-card
+      title="Total Collected"
+      [value]="totalCollected() | number: '1.0-0'"
+      [subtitle]="collectionRate() + '% Collection Efficiency'"
+      valueClass="text-success"
+      subClass="text-success"
+      icon=""
+      iconClass="collected"
+    />
+    <app-stat-card
+      title="Open Receivables"
+      [value]="totalOutstanding() | number: '1.0-0'"
+      [subtitle]="overdueCount() > 0 ? (overdueCount() + ' Overdue') : 'All invoices up to date'"
+      valueClass="text-danger"
+      subClass="text-danger"
+      icon=""
+      iconClass="outstanding"
+    />
+    <app-stat-card
+      title="Customer Accounts"
+      [value]="totalCustomers()"
+      [subtitle]="totalUsers() + ' System Users Active'"
+      icon=""
+      iconClass="clients"
+    />
   </div>
 
   <!-- CHARTS & VISUAL ANALYTICS ROW -->
   <div class="analytics-grid">
 
-    <!-- CHART 1: AGING BUCKETS -->
+    <!-- CHART 1: DYNAMIC ANALYTICS CHART WITH VIEW SWITCHER -->
     <div class="card chart-card">
-      <div class="card-header">
+      <div class="card-header chart-card-header">
         <div>
-          <h3>Receivables Aging Breakdown</h3>
-          <p>Distribution of outstanding receivables by days past due</p>
+          <div class="chart-header-title">
+            <h3>Collections & Finance</h3>
+            <!-- <span class="received-summary-badge">Total Received: {{ totalCollected() | number: '1.0-0' }}</span> -->
+          </div>
+          <!-- <p>
+            @if (activeChartTab() === 'collections') {
+              Cash received across recent timeframes (2 Days, 1 Week, 1 Month, 6 Months)
+            } @else if (activeChartTab() === 'monthly') {
+              Monthly invoiced revenue vs. realized cash collections
+            } @else {
+              Portfolio breakdown across invoice settlement statuses
+            }
+          </p> -->
         </div>
-        <span class="aging-summary-badge">Total: {{ totalOutstanding()  }}</span>
-      </div>
 
-      <div class="bar-chart-container">
-        <div class="chart-bars">
-          <!-- Bucket: Current -->
-          <div class="bar-col">
-            <span class="bar-val">{{ agingCurrent() | number: '1.0-0' }}</span>
-            <div class="bar-track">
-              <div class="bar-fill current" [style.height.%]="getAgingHeightPercent(agingCurrent())"></div>
-            </div>
-            <span class="bar-label">Current</span>
-            <small class="bar-sub">Due Soon</small>
-          </div>
-
-          <!-- Bucket: 1-30 Days -->
-          <div class="bar-col">
-            <span class="bar-val">{{ aging1To30() | number: '1.0-0' }}</span>
-            <div class="bar-track">
-              <div class="bar-fill warning" [style.height.%]="getAgingHeightPercent(aging1To30())"></div>
-            </div>
-            <span class="bar-label">1-30 Days</span>
-            <small class="bar-sub">Recent</small>
-          </div>
-
-          <!-- Bucket: 31-60 Days -->
-          <div class="bar-col">
-            <span class="bar-val">{{ aging31To60() | number: '1.0-0' }}</span>
-            <div class="bar-track">
-              <div class="bar-fill danger" [style.height.%]="getAgingHeightPercent(aging31To60())"></div>
-            </div>
-            <span class="bar-label">31-60 Days</span>
-            <small class="bar-sub">Moderate</small>
-          </div>
-
-          <!-- Bucket: 60+ Days -->
-          <div class="bar-col">
-            <span class="bar-val">{{ aging60Plus() | number: '1.0-0' }}</span>
-            <div class="bar-track">
-              <div class="bar-fill critical" [style.height.%]="getAgingHeightPercent(aging60Plus())"></div>
-            </div>
-            <span class="bar-label">60+ Days</span>
-            <small class="bar-sub">Critical</small>
-          </div>
+        <!-- VIEW SWITCHER BUTTONS -->
+        <div class="chart-tab-switcher">
+          <button
+            type="button"
+            class="chart-tab-btn"
+            [class.active]="activeChartTab() === 'collections'"
+            (click)="setChartTab('collections')"
+          >
+            Cash Received
+          </button>
+          <button
+            type="button"
+            class="chart-tab-btn"
+            [class.active]="activeChartTab() === 'monthly'"
+            (click)="setChartTab('monthly')"
+          >
+            Monthly Trend
+          </button>
+          <button
+            type="button"
+            class="chart-tab-btn"
+            [class.active]="activeChartTab() === 'status'"
+            (click)="setChartTab('status')"
+          >
+            Status Breakdown
+          </button>
         </div>
       </div>
+
+      <!-- VIEW 1: CASH RECEIVED TIMEFRAMES -->
+      @if (activeChartTab() === 'collections') {
+        <div class="bar-chart-container fade-in">
+          <div class="chart-bars">
+            <!-- 2 Days -->
+            <div class="bar-col">
+              <span class="bar-val">{{ received2Days() | number: '1.0-0' }}</span>
+              <div class="bar-track">
+                <div class="bar-fill period-2d" [style.height.%]="getReceivedHeightPercent(received2Days())">
+                  <span class="bar-tooltip">{{ received2DaysCount() }} payment(s)
+                     • {{ received2Days() | number: '1.0-0' }}
+                  </span>
+                </div>
+              </div>
+              <span class="bar-label">2 Days</span>
+              <small class="bar-sub">{{ received2DaysCount() }} payment(s) </small>
+            </div>
+
+            <!-- 1 Week -->
+            <div class="bar-col">
+              <span class="bar-val">{{ received1Week() | number: '1.0-0' }}</span>
+              <div class="bar-track">
+                <div class="bar-fill period-1w" [style.height.%]="getReceivedHeightPercent(received1Week())">
+                  <span class="bar-tooltip">{{ received1WeekCount() }} payment(s) • {{ received1Week() | number: '1.0-0' }}</span>
+                </div>
+              </div>
+              <span class="bar-label">1 Week</span>
+              <small class="bar-sub">{{ received1WeekCount() }} payment(s) </small>
+            </div>
+
+            <!-- 1 Month -->
+            <div class="bar-col">
+              <span class="bar-val">{{ received1Month() | number: '1.0-0' }}</span>
+              <div class="bar-track">
+                <div class="bar-fill period-1m" [style.height.%]="getReceivedHeightPercent(received1Month())">
+                  <span class="bar-tooltip">{{ received1MonthCount() }} payment(s) • {{ received1Month() | number: '1.0-0' }}</span>
+                </div>
+              </div>
+              <span class="bar-label">1 Month</span>
+              <small class="bar-sub">{{ received1MonthCount() }} payment(s) </small>
+            </div>
+
+            <!-- 6 Months -->
+            <div class="bar-col">
+              <span class="bar-val">{{ received6Months() | number: '1.0-0' }}</span>
+              <div class="bar-track">
+                <div class="bar-fill period-6m" [style.height.%]="getReceivedHeightPercent(received6Months())">
+                  <span class="bar-tooltip">{{ received6MonthsCount() }} payment(s) • {{ received6Months() | number: '1.0-0' }}</span>
+                </div>
+              </div>
+              <span class="bar-label">6 Months</span>
+              <small class="bar-sub">{{ received6MonthsCount() }} payment(s) 
+                <!-- • Last 180 days -->
+              </small>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- VIEW 2: MONTHLY TREND -->
+      @if (activeChartTab() === 'monthly') {
+        <div class="monthly-chart-container fade-in">
+          <div class="monthly-legend">
+            <span class="legend-item"><span class="legend-dot invoiced"></span> Invoiced</span>
+            <span class="legend-item"><span class="legend-dot collected"></span> Collected</span>
+          </div>
+
+          @if (monthlyTrend().length === 0) {
+            <div class="empty-chart">No monthly invoicing records available yet</div>
+          } @else {
+            <div class="monthly-bars">
+              @for (m of monthlyTrend(); track m.month) {
+                <div class="monthly-col">
+                  <div class="paired-bars">
+                    <div class="pair-bar-track">
+                      <div class="bar-fill invoiced" [style.height.%]="m.invoicedHeight">
+                        <span class="bar-tooltip">Invoiced: {{ m.invoiced | number: '1.0-0' }}</span>
+                      </div>
+                    </div>
+                    <div class="pair-bar-track">
+                      <div class="bar-fill collected" [style.height.%]="m.collectedHeight">
+                        <span class="bar-tooltip">Collected: {{ m.collected | number: '1.0-0' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="bar-label">{{ m.month }}</span>
+                  <small class="bar-sub">{{ m.invoiced | number: '1.0-0' }}</small>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- VIEW 3: STATUS BREAKDOWN -->
+      @if (activeChartTab() === 'status') {
+        <div class="status-chart-container fade-in">
+          <!-- Stacked distribution bar -->
+          <div class="distribution-bar">
+            @for (s of statusBreakdown(); track s.status) {
+              @if (s.percent > 0) {
+                <div
+                  class="distribution-segment"
+                  [style.width.%]="s.percent"
+                  [style.backgroundColor]="s.color"
+                  [title]="s.status + ': ' + s.percent + '% (' + (s.amount | number: '1.0-0') + ')'"
+                ></div>
+              }
+            }
+          </div>
+
+          <!-- Status Grid Breakdown Cards -->
+          <div class="status-breakdown-grid">
+            @for (s of statusBreakdown(); track s.status) {
+              <div class="status-breakdown-card" [style.borderLeftColor]="s.color">
+                <div class="status-info">
+                  <span class="status-name">{{ s.status }}</span>
+                  <strong>{{ s.amount | number: '1.0-0' }}</strong>
+                </div>
+                <div class="status-meta">
+                  <span class="status-badge" [style.color]="s.color">{{ s.count }} inv</span>
+                  <span class="status-percent">{{ s.percent }}%</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
 
     <!-- CHART 2: RECOVERY & COLLECTION RATE GAUGE -->
@@ -147,7 +267,7 @@
             <span class="dot green"></span>
             <div>
               <span>Cash Realized:</span>
-              <strong>{{ totalCollected() }}</strong>
+              <strong>{{ totalCollected() | number: '1.0-0' }}</strong>
             </div>
           </div>
 
@@ -155,7 +275,7 @@
             <span class="dot red"></span>
             <div>
               <span>Receivables at Risk:</span>
-              <strong>{{ totalOutstanding()  }}</strong>
+              <strong>{{ totalOutstanding() | number: '1.0-0' }}</strong>
             </div>
           </div>
 
@@ -163,7 +283,7 @@
             <span class="dot purple"></span>
             <div>
               <span>Total Contract Value:</span>
-              <strong>{{ totalRevenue() }}</strong>
+              <strong>{{ totalRevenue() | number: '1.0-0' }}</strong>
             </div>
           </div>
         </div>

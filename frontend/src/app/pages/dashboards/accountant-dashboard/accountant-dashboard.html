@@ -17,77 +17,74 @@
 
   <!-- STATS GRID -->
   <div class="stats-grid">
-    <div class="stat-card">
-      <!-- <div class="stat-icon revenue">💵</div> -->
-      <div>
-        <span class="stat-label">Total Invoiced</span>
-        <h2>{{ totalInvoiced()  }}</h2>
-         <!-- | number: '1.2-2' -->
-        <small class="stat-sub">Gross Billed Portfolio</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon collections">✓</div> -->
-      <div>
-        <span class="stat-label">Collected Collections</span>
-        <h2 class="text-success">{{ totalCollected() }}</h2>
-        <small class="stat-sub text-success">{{ recoveryRate() }}% Settled</small>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon receivables">⚠️</div> -->
-      <div>
-        <span class="stat-label">Unpaid Receivables</span>
-        <h2 class="text-danger">{{ totalOutstanding()  }}</h2>
-         <small class="stat-sub text-danger"> <!-- {{ overdueInvoices() }} --> Overdue</small> 
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <!-- <div class="stat-icon treasury">🏦</div> -->
-      <div>
-        <span class="stat-label">Unallocated Cash</span>
-        <h2 class="text-warning">{{ unallocatedCash()  }}</h2>
-        <small class="stat-sub">Pending Allocation to Invoices</small>
-      </div>
-    </div>
+    <app-stat-card
+      title="Total Reminders"
+      [value]="totalReminders() "
+      subtitle="Created by only Admin"
+      icon=""
+      iconClass="reminders"
+    />
+    <app-stat-card
+      title="Collected Collections"
+      [value]="totalCollected() | number: '1.0-0'"
+      [subtitle]="recoveryRate() + '% Settled'"
+      valueClass="text-success"
+      subClass="text-success"
+      icon=""
+      iconClass="collected"
+    />
+    <app-stat-card
+      title="Unpaid Receivables"
+      [value]="totalOutstanding() | number: '1.0-0'"
+      [subtitle]="overdueInvoices() > 0 ? (overdueInvoices() + ' Overdue') : 'No overdue invoices'"
+      valueClass="text-danger"
+      subClass="text-danger"
+      icon=""
+      iconClass="outstanding"
+    />
+    <app-stat-card
+      title="Unallocated Cash"
+      [value]="unallocatedCash() | number: '1.0-0'"
+      subtitle="Pending Allocation to Invoices"
+      valueClass="text-warning"
+      icon=""
+      iconClass="treasury"
+    />
   </div>
 
-  <!-- AGING BUCKETS STRIP -->
+  <!-- CASH RECEIPTS TIMELINE STRIP -->
   <div class="card aging-strip-card">
     <div class="card-header">
       <div>
-        <h3>Receivables Aging Analysis</h3>
-        <p>Outstanding balances categorized by payment age bracket</p>
+        <h3>Cash Inflow & Received Amounts</h3>
+        <p>Total cash collected across recent timeframes</p>
       </div>
-      <a routerLink="/invoices" class="view-link">View Full Ledger →</a>
+      <a routerLink="/payments" class="view-link">View All Payments →</a>
     </div>
 
     <div class="aging-strip">
-      <div class="aging-box current">
-        <span class="box-title">Current (Not Overdue)</span>
-        <strong>{{ agingCurrent() | number: '1.2-2' }}</strong>
-        <small>Due within credit window</small>
+      <div class="aging-box period-2d">
+        <span class="box-title">Last 2 Days</span>
+        <strong>{{ received2Days() | number: '1.0-0' }}</strong>
+        <small>{{ received2DaysCount() }} payment(s) • Last 48 hrs</small>
       </div>
 
-      <div class="aging-box warning">
-        <span class="box-title">1 - 30 Days Overdue</span>
-        <strong>{{ aging1To30() | number: '1.2-2' }}</strong>
-        <small>Courtesy reminder due</small>
+      <div class="aging-box period-1w">
+        <span class="box-title">Last 1 Week</span>
+        <strong>{{ received1Week() | number: '1.0-0' }}</strong>
+        <small>{{ received1WeekCount() }} payment(s) • Last 7 days</small>
       </div>
 
-      <div class="aging-box danger">
-        <span class="box-title">31 - 60 Days Overdue</span>
-        <strong>{{ aging31To60() | number: '1.2-2' }}</strong>
-        <small>Escalate credit follow-up</small>
+      <div class="aging-box period-1m">
+        <span class="box-title">Last 1 Month</span>
+        <strong>{{ received1Month() | number: '1.0-0' }}</strong>
+        <small>{{ received1MonthCount() }} payment(s) • Last 30 days</small>
       </div>
 
-      <div class="aging-box critical">
-        <span class="box-title">60+ Days Overdue</span>
-        <strong>{{ aging60Plus() | number: '1.2-2' }}</strong>
-        <small>Critical default risk</small>
+      <div class="aging-box period-6m">
+        <span class="box-title">Last 6 Months</span>
+        <strong>{{ received6Months() | number: '1.0-0' }}</strong>
+        <small>{{ received6MonthsCount() }} payment(s) • Last 180 days</small>
       </div>
     </div>
   </div>
@@ -96,7 +93,7 @@
   <!-- <div class="content-grid"> -->
 
     <!-- RECENT INVOICES -->
-    <div class="card aging-strip-card">
+    <!-- <div class="card aging-strip-card">
       <div class="card-header">
         <div>
           <h3>Recent Invoices</h3>
@@ -124,9 +121,9 @@
                 <tr>
                   <td class="font-bold text-primary">{{ inv.invoiceNumber }}</td>
                   <td>{{ inv.customerName }}</td>
-                  <td >{{ inv.totalAmount | number: '1.2-2' }}</td>
+                  <td >{{ inv.totalAmount  }}</td>
                   <td class=" font-medium" [class.text-danger]="inv.outstandingAmount > 0">
-                    {{ inv.outstandingAmount | number: '1.2-2' }}
+                    {{ inv.outstandingAmount  }}
                   </td>
                   <td>
                     <span class="status-pill" [class]="inv.status.toLowerCase().replace(' ', '-')">
@@ -143,7 +140,7 @@
           </table>
         }
       </div>
-    </div>
+    </div> -->
 
     <!-- RECENT PAYMENTS -->
     <div class="card aging-strip-card">
@@ -170,7 +167,7 @@
               <tr>
                 <td class="text-muted">{{ p.paymentDate }}</td>
                 <td><strong>{{ p.customerName }}</strong></td>
-                <td class=" text-success font-bold">{{ p.amount | number: '1.2-2' }}</td>
+                <td class=" text-success font-bold">{{ p.amount  }}</td>
                 <td>
                   @if (p.unallocatedAmount > 0) {
                     <span class="badge-pending">Unallocated</span>

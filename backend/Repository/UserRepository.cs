@@ -1,4 +1,4 @@
-﻿using backend.Model;
+using backend.Model;
 using backend.Data;
 using backend.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -61,7 +61,30 @@ public class UserRepository : IUserRepository
             PageNumber = pageNumber,
             PageSize = pageSize
         };
-
-
     }
+
+    public async Task<bool> UpdateAsync(User user)
+    {
+        _context.Users.Update(user);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+    public async Task<bool> RoleExistsAsync(int roleId)
+    {
+        return await _context.Roles.AnyAsync(r => r.Id == roleId);
+    }
+
+    public async Task<bool> DeleteAsync(User user)
+    {
+        _context.Users.Remove(user);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
 }

@@ -1,0 +1,14 @@
+<div class="stat-card">
+  @if (icon()) {
+    <div class="stat-icon" [ngClass]="iconClass()">
+      <span>{{ icon() }}</span>
+    </div>
+  }
+  <div class="stat-body">
+    <span class="stat-title">{{ title() }}</span>
+    <h2 [ngClass]="valueClass()">{{ value() }}</h2>
+    @if (subtitle()) {
+      <small class="stat-sub" [ngClass]="subClass()">{{ subtitle() }}</small>
+    }
+  </div>
+</div>

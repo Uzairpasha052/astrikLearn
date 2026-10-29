@@ -6,7 +6,7 @@ namespace backend.Interface;
 
 public interface ICustomerRepository
 {
-    //Task<List<Customer>> GetAllAsync();
+    Task<List<Customer>> GetAllAsync();
     Task<Customer?> GetByIdAsync(int id);
     Task<Customer> CreateAsync(Customer customer);
     Task<Customer?> GetByEmailAsync(string email);

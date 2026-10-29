@@ -130,6 +130,31 @@
       }
     </div>
 
+    <!-- Admin Only Readonly Total Amount Summary -->
+    @if (isAdmin) {
+      <div class="admin-summary-strip">
+        <div class="admin-summary-badge">
+          <!-- <span class="lock-icon">🔒</span> -->
+          <span class="badge-title">Financial Summary</span>
+          <span class="badge-status">Read-Only</span>
+        </div>
+        <div class="admin-summary-metrics">
+          <div class="metric-card">
+            <span class="metric-label">Total Payment Amount</span>
+            <span class="metric-value font-bold">{{ totalPaymentAmount()  }}</span>
+          </div>
+          <div class="metric-card success">
+            <span class="metric-label">Total Allocated</span>
+            <span class="metric-value font-bold text-success">{{ totalAllocatedAmount()  }}</span>
+          </div>
+          <!-- <div class="metric-card warning">
+            <span class="metric-label">Total Unallocated</span>
+            <span class="metric-value font-bold text-warning">{{ totalUnallocatedAmount() }}</span>
+          </div> -->
+        </div>
+      </div>
+    }
+
     <!-- PAGINATION -->
     <div class="pagination-footer">
       <span class="text-muted">
@@ -240,7 +265,7 @@
           <div>
             <div class="badge-tag">LEDGER ALLOCATION</div>
             <h2>Distribute Funds: Payment #{{ selectedPayment()!.id }}</h2>
-            <p>Customer: <strong>{{ selectedPayment()!.customerName }}</strong> &bull; Total Payment: <strong>${{ selectedPayment()!.amount | number: '1.2-2' }}</strong></p>
+            <p>Customer: <strong>{{ selectedPayment()!.customerName }}</strong> &bull; Total Payment: <strong>{{ selectedPayment()!.amount | number: '1.2-2' }}</strong></p>
           </div>
           <button class="btn-close" (click)="closeAllocateModal()">✕</button>
         </div>

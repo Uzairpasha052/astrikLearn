@@ -71,7 +71,7 @@ export class Login {
             } else {
               this.router.navigate(['/invoices']);
             }
-          }, 300);
+          }, 3000);
         },
         error: (err) => {
           this.loading.set(false);

@@ -36,6 +36,9 @@ export class Payment implements OnInit {
 
   // Role permissions
   canRecord = this.authService.hasRole('Admin', 'Accountant');
+  get isAdmin(): boolean {
+    return this.authService.hasRole('Admin');
+  }
 
   // State
   payments = signal<PaymentDisplayDto[]>([]);
@@ -91,7 +94,7 @@ export class Payment implements OnInit {
     this.loading.set(true);
     this.paymentService.getPayments(page, this.pageSize()).subscribe({
       next: (res) => {
-        console.log(res)
+        // console.log(res)
         this.payments.set(res.items);
         this.currentPage.set(res.pageNumber);
         this.totalCount.set(res.totalCount);
@@ -127,6 +130,19 @@ export class Payment implements OnInit {
 
     return list;
   });
+
+  // Readonly financial totals for Admin
+  totalPaymentAmount = computed(() =>
+    this.filteredPayments().reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+  );
+
+  totalAllocatedAmount = computed(() =>
+    this.filteredPayments().reduce((sum, p) => sum + (Number(p.amountAllocated) || 0), 0)
+  );
+
+  totalUnallocatedAmount = computed(() =>
+    this.filteredPayments().reduce((sum, p) => sum + (Number(p.unallocatedAmount) || 0), 0)
+  );
 
   // RECORD PAYMENT MODAL
   openRecordModal(): void {

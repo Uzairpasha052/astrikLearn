@@ -64,7 +64,7 @@
               <th>Billing Address</th>
               <th>Status</th>
               @if (canEditDelete) {
-                <th class="text-right">Actions</th>
+                <th class="">Actions</th>
               }
             </tr>
           </thead>
@@ -92,10 +92,10 @@
                   <td class="text-right">
                     <div class="action-buttons">
                       <button class="btn-sm btn-outline" (click)="edit(c)" title="Edit Customer">
-                        ✏ 
+                        <!-- ✏  --> Edit
                       </button>
                       <button class="btn-sm btn-danger-outline" (click)="confirmDelete(c)" title="Delete Customer">
-                        🗑 
+                        <!-- 🗑  --> Del
                       </button>
                     </div>
                   </td>
@@ -186,6 +186,21 @@
             <label>Registered Address</label>
             <textarea formControlName="address" rows="3" placeholder="Street, City, Country" class="form-control"></textarea>
           </div>
+
+          @if(editingId()){
+          <div class="form-groups">
+             <label for="isActive">
+              Active Customer
+            </label>
+
+            <input
+              type="checkbox"
+              id="isActive"
+              /* class="form-control" */
+              formControlName="isActive"
+            />
+          </div>
+          }
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>

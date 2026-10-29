@@ -5,17 +5,20 @@ import { InvoiceService } from '../../../services/invoiceService/invoice.service
 import { CustomerService } from '../../../services/customerService/customer-service';
 import { InvoiceDisplayDto } from '../../../model/Invoice.model';
 import { CustomerDto } from '../../../model/Customer.model';
+import { ReminderService } from '../../../services/reminderService/reminder.service';
+import { StatCard } from '../../../components/stat-card/stat-card';
 
 @Component({
   selector: 'app-sales-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, StatCard],
   templateUrl: './sales-dashboard.html',
   styleUrl: './sales-dashboard.scss'
 })
 export class SalesDashboard implements OnInit {
   private invoiceService = inject(InvoiceService);
   private customerService = inject(CustomerService);
+  private reminderService = inject(ReminderService);
 
   loading = signal(true);
   invoices = signal<InvoiceDisplayDto[]>([]);
@@ -25,6 +28,7 @@ export class SalesDashboard implements OnInit {
   totalInvoicesCount = signal(0);
   activeAccounts = signal(0);
   pendingRevenue = signal(0);
+  totalReminder = signal(0);
 
   ngOnInit(): void {
     this.loadData();
@@ -59,6 +63,13 @@ export class SalesDashboard implements OnInit {
       next: (res) => {
         this.customers.set(res.items.filter((c) => c.isActive));
         this.activeAccounts.set(res.totalCount);
+      },
+      error: () => {}
+    });
+
+    this.reminderService.getReminders(1, 10).subscribe({
+      next: (res) => {
+        this.totalReminder.set(res.totalCount);
       },
       error: () => {}
     });

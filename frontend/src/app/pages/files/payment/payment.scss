@@ -298,6 +298,96 @@
   font-size: 12px;
 }
 
+/* Admin Financial Summary Strip (Read-Only) */
+.admin-summary-strip {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  .admin-summary-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 6px 12px;
+    border-radius: 8px;
+
+    .lock-icon {
+      font-size: 13px;
+    }
+
+    .badge-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #065f46;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-status {
+      font-size: 11px;
+      font-weight: 600;
+      background: #d1fae5;
+      color: #047857;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+  }
+
+  .admin-summary-metrics {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 160px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+      .metric-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: 0.5px;
+      }
+
+      .metric-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        font-variant-numeric: tabular-nums;
+      }
+
+      &.success .metric-value {
+        color: #059669;
+      }
+
+      &.warning .metric-value {
+        color: #d97706;
+      }
+
+      &.danger .metric-value {
+        color: #dc2626;
+      }
+    }
+  }
+}
+
 /* Pagination */
 .pagination-footer {
   display: flex;

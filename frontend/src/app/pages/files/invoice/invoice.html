@@ -140,7 +140,8 @@
                         [title]="inv.amountPaid > 0 ? 'Cannot edit invoice with paid balance' : 'Edit Invoice'"
                         (click)="openEditModal(inv)"
                       >
-                        ✏
+                        <!-- ✏ -->
+                         Edit
                       </button>
 
                       <button
@@ -149,7 +150,8 @@
                         [title]="inv.amountPaid > 0 ? 'Cannot delete invoice with payments' : 'Delete Invoice'"
                         (click)="confirmDelete(inv)"
                       >
-                        🗑
+                        <!-- 🗑 -->
+                        Del
                       </button>
                     }
                   </div>
@@ -173,6 +175,31 @@
         </table>
       }
     </div>
+
+    <!-- Admin Only Readonly Total Amount Summary -->
+    @if (isAdmin) {
+      <div class="admin-summary-strip">
+        <div class="admin-summary-badge">
+          <!-- <span class="lock-icon">🔒</span> -->
+          <span class="badge-title">Financial Summary</span>
+          <span class="badge-status">Read-Only</span>
+        </div>
+        <div class="admin-summary-metrics">
+          <div class="metric-card">
+            <span class="metric-label">Total Invoiced Amount</span>
+            <span class="metric-value font-bold">{{ totalInvoicesAmount() }}</span>
+          </div>
+          <div class="metric-card success">
+            <span class="metric-label">Total Paid</span>
+            <span class="metric-value font-bold text-success">{{ totalPaidAmount() }}</span>
+          </div>
+          <!-- <div class="metric-card danger">
+            <span class="metric-label">Total Outstanding</span>
+            <span class="metric-value font-bold text-danger">{{ totalOutstandingAmount() }}</span>
+          </div> -->
+        </div>
+      </div>
+    }
 
     <!-- PAGINATION -->
     <div class="pagination-footer">
@@ -288,7 +315,7 @@
                         />
                       </td>
                       <td class="text-right font-medium">
-                        {{ getItemLineTotal($index) | number: '1.2-2' }}
+                        {{ getItemLineTotal($index)}}
                       </td>
                       <td class="text-center">
                         <button
@@ -309,11 +336,11 @@
             <div class="grand-total-card">
               <div class="total-row">
                 <span>Subtotal:</span>
-                <strong>{{ getCalculatedGrandTotal() | number: '1.2-2' }}</strong>
+                <strong>{{ getCalculatedGrandTotal() }}</strong>
               </div>
               <div class="total-row grand">
                 <span>Total Invoice Balance:</span>
-                <span class="total-amount">{{ getCalculatedGrandTotal() | number: '1.2-2' }}</span>
+                <span class="total-amount">{{ getCalculatedGrandTotal() }}</span>
               </div>
             </div>
           </div>

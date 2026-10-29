@@ -412,6 +412,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+
+  scrollbar-width: none;
 }
 
 .modal-lg {

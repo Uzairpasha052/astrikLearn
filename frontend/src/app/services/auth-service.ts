@@ -41,6 +41,7 @@ export interface UserDisplay {
 })
 export class AuthService {
   private url = `${environment.apiUrl}/api/auth`;
+  private userUrl = `${environment.apiUrl}/api/user`;
 
   constructor(
     private http: HttpClient,
@@ -59,9 +60,19 @@ export class AuthService {
     pageNumber: number = 1,
     pageSize: number = 10
   ): Observable<PagedResult<UserDisplay>> {
-    return this.http.get<PagedResult<UserDisplay>>(`${this.url}/users`, {
+    return this.http.get<PagedResult<UserDisplay>>(`${this.userUrl}`, {
       params: { pageNumber, pageSize }
     });
+  }
+
+   // Delete a user by ID
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.userUrl}/${id}`);
+  }
+
+  // Update a user by ID (partial data)
+  updateUser(id: number, dto: Partial<UserDisplay>): Observable<UserDisplay> {
+    return this.http.put<UserDisplay>(`${this.userUrl}/${id}`, dto);
   }
 
   getToken(): string | null {

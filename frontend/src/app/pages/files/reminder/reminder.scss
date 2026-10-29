@@ -364,6 +364,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+
+  scrollbar-width: none;
 }
 
 .modal-sm {
@@ -541,4 +543,25 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+
+
+// .message-preview {
+//   display: inline-block;
+//   max-width: 250px;
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   vertical-align: middle;
+//   cursor: help;
+// }
+
+
+.message-preview {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  // cursor: help;
 }
