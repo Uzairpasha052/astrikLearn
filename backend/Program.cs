@@ -82,6 +82,7 @@ builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<ReminderService>();
 builder.Services.AddScoped<AuditLogService>();
+builder.Services.AddScoped<CustomerExcelService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CurrentUserService>();

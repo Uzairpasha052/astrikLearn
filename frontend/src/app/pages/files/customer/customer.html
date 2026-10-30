@@ -9,6 +9,11 @@
     </div>
 
     <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportCustomer()"
+          [disabled]="isExporting">
+        <span class="btn-icon">⭳</span>
+        {{ isExporting ? 'Exporting...' : 'Export' }}
+      </button>
       @if (canCreate) {
         <button class="btn btn-primary" (click)="openForm()">
           <span class="btn-icon">+</span> Add Customer
@@ -144,7 +149,80 @@
         </button>
       </div>
     </div>
+
+    
+    
   </div>
+  
+  <div class="filters-card mt">
+    <div class="customer-excel">
+
+      <div>
+        <!-- Export Button -->
+        <button
+          type="button"
+          (click)="exportCustomer()"
+          [disabled]="isExporting">
+  
+          {{ isExporting ? 'Exporting...' : 'Export Excel' }}
+  
+        </button>
+      </div>
+
+      <hr>
+
+      <div>
+        <!-- Import Section -->
+        <div>
+          <label for="excelFile">Select Customer Excel File:</label>
+  
+          <input
+          #fileInput
+            type="file"
+            id="excelFile"
+            accept=".xlsx"
+            (change)="onFileSelected($event)"
+            [disabled]="isImporting">
+        </div>
+
+        <div class="excelBtn">
+          <button
+            type="button"
+            (click)="importCustomer()"
+            [disabled]="!selectedFile || isImporting">
+    
+            {{ isImporting ? 'Importing...' : 'Import Excel' }}
+    
+          </button>
+    
+          @if (selectedFile) {
+            <p>Selected file: {{ selectedFile.name }}</p>
+          }
+        </div>
+  
+        <!-- Success Message -->
+        @if (excelMessage) {
+          <p style="color: green;">
+            {{ excelMessage }}
+          </p>
+        }
+  
+        <!-- Error Message -->
+        @if (excelErrorMessage) {
+          <p style="color: red;">
+            {{ excelErrorMessage }}
+          </p>
+        }
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+
+
 
   <!-- MODAL: ADD / EDIT CUSTOMER -->
   @if (showModal()) {

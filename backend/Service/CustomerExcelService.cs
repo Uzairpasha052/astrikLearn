@@ -5,7 +5,6 @@ using backend.Interface;
 using backend.Model.Database;
 
 namespace backend.Service;
-
 public class CustomerExcelService
 {
     private readonly ICustomerRepository _repository;
@@ -109,7 +108,7 @@ public class CustomerExcelService
             var email = worksheet.Cell(row, 2).GetString().Trim();
             var phone = worksheet.Cell(row, 3).GetString().Trim();
             var address = worksheet.Cell(row, 4).GetString().Trim();
-            var activeText = worksheet.Cell(row, 5).GetString().Trim();
+            //var activeText = worksheet.Cell(row, 5).GetString().Trim();
 
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -117,12 +116,12 @@ public class CustomerExcelService
                 continue;
             }
 
-            if (!bool.TryParse(activeText, out bool isActive))
-            {
-                errors.Add(
-                    $"Row {row}: IsActive must be TRUE or FALSE.");
-                continue;
-            }
+            //if (!bool.TryParse(activeText, out bool isActive))
+            //{
+            //    errors.Add(
+            //        $"Row {row}: IsActive must be TRUE or FALSE.");
+            //    continue;
+            //}
 
             if (!string.IsNullOrWhiteSpace(email))
             {
@@ -147,7 +146,7 @@ public class CustomerExcelService
                 Email = string.IsNullOrWhiteSpace(email) ? null : email,
                 Phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
                 Address = string.IsNullOrWhiteSpace(address) ? null : address,
-                IsActive = isActive,
+                IsActive = true,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow
             };

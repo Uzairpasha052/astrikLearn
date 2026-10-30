@@ -6,6 +6,12 @@
   font-family: inherit;
 }
 
+.header-actions{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -51,6 +57,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   flex-wrap: wrap;
 }
+
 
 .search-box {
   display: flex;
@@ -239,13 +246,13 @@
 }
 
 .btn-secondary {
-  background: #f1f5f9;
+  background: #ffffff;
   color: #334155;
   border-color: #cbd5e1;
 }
 
 .btn-secondary:hover {
-  background: #e2e8f0;
+  background: #f8fafc;
 }
 
 .btn-outline {
@@ -532,4 +539,107 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+
+
+
+
+
+
+
+
+
+.mt{
+  margin-top: 25px;
+}
+
+
+/* Excel Import / Export Section */
+.customer-excel {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Export Excel Button */
+.customer-excel button:first-of-type {
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #2563eb;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.customer-excel button:first-of-type:hover {
+  background: #1d4ed8;
+}
+
+.customer-excel button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Divider */
+.customer-excel hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 8px 0;
+}
+
+/* File Label */
+.customer-excel label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+}
+
+/* File Input */
+.customer-excel input[type="file"] {
+  font-size: 11px;
+  color: #475569;
+  margin-left: 5px;
+}
+
+/* Import Excel Button */
+.customer-excel button:last-of-type {
+  background: #ffffff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: 0.2s ease;
+}
+
+.customer-excel button:last-of-type:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+/* Disabled Import Button */
+.customer-excel button:last-of-type:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #cbd5e1;
+}
+
+/* Messages */
+.customer-excel p {
+  font-size: 11px;
+  margin: 5px 0;
+}
+
+.excelBtn{
+  display: flex;
+  justify-content: space-between;
 }

@@ -32,7 +32,7 @@ public class CustomerExcelController : ControllerBase
     [Authorize(Roles = "Admin,Sales")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ImportCustomers(
-        [FromForm] IFormFile file)
+        IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Please upload an Excel file.");

@@ -1,10 +1,13 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { CustomerService } from '../../../services/customerService/customer-service';
 import { AuthService } from '../../../services/auth-service';
 import { CustomerDto, CreateCustomerDto, UpdateCustomerDto } from '../../../model/Customer.model';
+import { ExcelService } from '../../../services/excelService/excel.service';
+
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-customer',
@@ -18,6 +21,7 @@ export class Customer implements OnInit {
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private toast = inject(ToastrService);
+  private excelService = inject(ExcelService);
 
   canCreate = this.authService.hasRole('Admin', 'Sales');
   canEditDelete = this.authService.hasRole('Admin');
@@ -39,6 +43,16 @@ export class Customer implements OnInit {
   showDeleteModal = signal(false);
   editingId = signal<number | null>(null);
   customerToDelete = signal<CustomerDto | null>(null);
+
+
+  // For excel File
+  selectedFile: File | null = null
+
+  isExporting = false
+  isImporting = false
+
+  excelMessage = ''
+  excelErrorMessage = ''
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -199,4 +213,113 @@ export class Customer implements OnInit {
       this.loadCustomers(p);
     }
   }
+
+  //Excel import and export
+
+  //Select excel File
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement
+
+    this.excelMessage = ''
+    this.excelErrorMessage = ''
+
+    const file = input.files?.[0]
+
+    if(!file){
+      this.selectedFile = null
+      return
+    }
+
+    if(!file.name.toLowerCase().endsWith('.xlsx')){
+      this.excelErrorMessage = "Please select an .xlsx file"
+      this.selectedFile = null
+      input.value = ''
+      return
+    }
+
+    this.selectedFile = file
+  }
+
+  // export excel file
+  exportCustomer(): void {
+    this.isExporting = true
+    this.excelMessage = ''
+    this.excelErrorMessage = ''
+
+    this.excelService.customerExport().pipe(
+      finalize(() => {
+        this.isImporting = false
+      })
+    )
+    .subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `Customers_${new Date().getTime()}.xlsx`
+
+          // Append, click, and clean up
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Revoke URL after a slight delay to allow download initiation
+        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        
+        // window.URL.revokeObjectURL(url)
+
+        this.excelMessage = "Customer exported Successfully"
+        // this.isExporting = false
+      },
+      error: (error) => {
+        console.error(error)
+
+        this.excelErrorMessage = 'Failed to export customers.';
+        this.isExporting = false;
+      }
+    })
+  }
+
+  // import excel file
+  importCustomer(): void {
+    if(!this.selectedFile){
+      this.excelErrorMessage = "Please select an excel file first."
+      return
+    }
+
+    this.isImporting = true
+    this.excelMessage = ''
+    this.excelErrorMessage = ''
+
+    this.excelService.customerImport(this.selectedFile).pipe(
+      finalize(() => {
+        this.isImporting = false
+      })
+    )
+    .subscribe({
+      next: (res) => {
+        this.excelMessage = res.message || 'Customers imported Successfully'
+        this.selectedFile = null
+
+        if (this.fileInput) {
+          this.fileInput.nativeElement.value = '';
+        }
+        this.loadCustomers();
+      },
+      error: (err) => {
+        console.error(err)
+
+        this.excelErrorMessage =
+          err.error?.message || 'Failed to import customers.';
+
+        this.isImporting = false;
+      }
+    })
+
+  }
+
+
 }
